@@ -1,7 +1,8 @@
 {
   "expo": {
-    "name": "SocialSense",
-    "slug": "socialsense",
+    "name": "SocialSence",
+    "slug": "socialsence",
+    "owner": "nguyenvantung3005",
     "version": "1.0.0",
     "scheme": "socialsense",
     "orientation": "portrait",
