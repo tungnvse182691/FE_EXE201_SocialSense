@@ -91,6 +91,13 @@ export async function reloadApiKeyPool(clearCooldowns = false): Promise<{ messag
   return res.data;
 }
 
+export async function clearApiKeyCooldowns(): Promise<{ message: string; totalKeys: number }> {
+  const res = await apiClient.post<{ message: string; totalKeys: number }>(
+    '/admin/api-keys/clear-cooldown'
+  );
+  return res.data;
+}
+
 export async function getSupportedModels(): Promise<SupportedModelsResponse> {
   const res = await apiClient.get<SupportedModelsResponse>('/admin/models');
   return res.data;

@@ -18,6 +18,7 @@ import {
   useUpdateApiKey,
   useDeleteApiKey,
   useReloadApiKeyPool,
+  useClearApiKeyCooldowns,
   useAdminModels,
 } from '@/features/admin/hooks';
 import { Card } from '@/components/ui/Card';
@@ -605,6 +606,7 @@ export default function ApiKeysScreen() {
   const { mutate: updateKey, isPending: isUpdating } = useUpdateApiKey();
   const { mutate: deleteKey } = useDeleteApiKey();
   const { mutate: reloadPool, isPending: isReloading } = useReloadApiKeyPool();
+  const { mutate: clearCooldowns, isPending: isClearing } = useClearApiKeyCooldowns();
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingItem, setEditingItem] = useState<ApiKeyItem | null>(null);
@@ -682,11 +684,11 @@ export default function ApiKeysScreen() {
   }, [reloadPool, showToast]);
 
   const handleReloadClear = useCallback(() => {
-    reloadPool(true, {
-      onSuccess: () => showToast('Đã reload và xóa toàn bộ cooldown'),
-      onError: () => showToast('Reload thất bại', 'error'),
+    clearCooldowns(undefined, {
+      onSuccess: (data) => showToast(`Đã xóa cooldown cho ${data.totalKeys} key`),
+      onError: () => showToast('Xóa cooldown thất bại', 'error'),
     });
-  }, [reloadPool, showToast]);
+  }, [clearCooldowns, showToast]);
 
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
@@ -734,7 +736,7 @@ export default function ApiKeysScreen() {
             </Button>
           </View>
           <View className="flex-1">
-            <Button variant="outline" onPress={handleReloadClear} loading={isReloading}>
+            <Button variant="outline" onPress={handleReloadClear} loading={isClearing}>
               🧹 Clear Cooldown
             </Button>
           </View>

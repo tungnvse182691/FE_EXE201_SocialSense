@@ -12,6 +12,7 @@ import {
   updateApiKey,
   deleteApiKey,
   reloadApiKeyPool,
+  clearApiKeyCooldowns,
   getSupportedModels,
   compareStats,
 } from './api';
@@ -138,6 +139,14 @@ export function useReloadApiKeyPool() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (clearCooldowns?: boolean) => reloadApiKeyPool(clearCooldowns),
+    onSuccess: () => qc.invalidateQueries({ queryKey: adminKeys.apiKeys }),
+  });
+}
+
+export function useClearApiKeyCooldowns() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: () => clearApiKeyCooldowns(),
     onSuccess: () => qc.invalidateQueries({ queryKey: adminKeys.apiKeys }),
   });
 }
