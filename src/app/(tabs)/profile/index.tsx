@@ -179,7 +179,7 @@ export default function ProfileScreen() {
 
         {/* App version */}
         <Text className="text-xs text-gray-400 text-center mt-6">
-          SocialSense Mobile v1.0.0
+          SocialSence Mobile v1.0.0
         </Text>
       </ScrollView>
     </SafeAreaView>

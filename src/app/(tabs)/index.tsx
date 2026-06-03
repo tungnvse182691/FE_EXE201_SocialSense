@@ -54,7 +54,7 @@ export default function DashboardScreen() {
     >
       {/* Logo Header */}
       <AppHeader
-        title="SocialSense"
+        title="SocialSence"
         subtitle="Tạo nội dung AI thông minh"
         rightSlot={isLoading ? undefined : <TierBadge tier={tier} />}
       />
