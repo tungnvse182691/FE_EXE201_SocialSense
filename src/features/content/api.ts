@@ -56,6 +56,9 @@ export async function analyzeImageContent(
 export async function generateImage(
   data: ImageGenerateRequest
 ): Promise<ImageGenerateResponse> {
-  const res = await apiClient.post<ImageGenerateResponse>('/content/image/generate', data);
+  // Image generation qua Pollinations/HuggingFace có thể mất 60-90s
+  const res = await apiClient.post<ImageGenerateResponse>('/content/image/generate', data, {
+    timeout: 90000,
+  });
   return res.data;
 }

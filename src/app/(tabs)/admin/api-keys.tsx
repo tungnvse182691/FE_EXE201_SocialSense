@@ -48,9 +48,10 @@ function providerBadgeClasses(provider: string): { bg: string; text: string } {
 interface ProviderSelectorProps {
   value: string;
   onChange: (v: string) => void;
+  onProviderChange?: (v: string, defaults: { model: string; imageGen: boolean }) => void;
 }
 
-function ProviderSelector({ value, onChange }: ProviderSelectorProps) {
+function ProviderSelector({ value, onChange, onProviderChange }: ProviderSelectorProps) {
   return (
     <View>
       <Text className="text-xs text-gray-500 mb-1.5">Provider</Text>
@@ -58,7 +59,11 @@ function ProviderSelector({ value, onChange }: ProviderSelectorProps) {
         {PROVIDERS.map((p) => (
           <TouchableOpacity
             key={p}
-            onPress={() => onChange(p)}
+            onPress={() => {
+              onChange(p);
+              const defaults = DEFAULT_MODEL_BY_PROVIDER[p] ?? { model: '', imageGen: false };
+              onProviderChange?.(p, defaults);
+            }}
             className={`px-3 py-1.5 rounded-full border ${
               value === p
                 ? 'bg-primary-500 border-primary-500'
@@ -76,6 +81,16 @@ function ProviderSelector({ value, onChange }: ProviderSelectorProps) {
           </TouchableOpacity>
         ))}
       </View>
+      {/* Hint cho provider đang chọn */}
+      {value === 'pollinations' && (
+        <Text className="text-xs text-pink-500 mt-1.5">🖼 Pollinations — Image only, đã bật Image Generation</Text>
+      )}
+      {value === 'huggingface' && (
+        <Text className="text-xs text-yellow-600 mt-1.5">🤗 HuggingFace — Image only, đã bật Image Generation</Text>
+      )}
+      {value === 'groq' && (
+        <Text className="text-xs text-orange-500 mt-1.5">⚡ Groq — Text only, FREE unlimited</Text>
+      )}
     </View>
   );
 }
@@ -291,7 +306,20 @@ function KeyFormFields({ state, onChange, showKeyField, modelSuggestions }: KeyF
       )}
 
       {/* Provider */}
-      <ProviderSelector value={state.provider} onChange={(v) => onChange({ provider: v })} />
+      <ProviderSelector
+        value={state.provider}
+        onChange={(v) => onChange({ provider: v })}
+        onProviderChange={(_v, defaults) => {
+          // Chỉ auto-fill model nếu field đang trống hoặc là default của provider cũ
+          const currentIsDefault = Object.values(DEFAULT_MODEL_BY_PROVIDER)
+            .some(d => d.model === state.modelOverride);
+          if (!state.modelOverride || currentIsDefault) {
+            onChange({ modelOverride: defaults.model });
+          }
+          // Luôn auto-set supportsImageGen khi đổi provider
+          onChange({ supportsImageGen: defaults.imageGen });
+        }}
+      />
 
       {/* Model override */}
       <ModelSuggestInput

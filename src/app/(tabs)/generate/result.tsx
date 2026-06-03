@@ -248,6 +248,8 @@ export default function GenerateResultScreen() {
                   // Encode \n thành \\n để truyền qua Expo Router params an toàn
                   contentText: [item.hook, item.body, item.cta].join('\\n\\n'),
                   platform: item.platform,
+                  // Truyền bannerImagePrompt để dùng làm draftPrompt khi analyze
+                  bannerImagePrompt: item.bannerImagePrompt ?? '',
                 },
               })
             }

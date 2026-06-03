@@ -430,6 +430,8 @@ export default function HistoryDetailScreen() {
                     params: {
                       contentHistoryId: String(localItem.id),
                       platform: content.platform,
+                      // Truyền bannerImagePrompt để skip analyze step nếu có
+                      bannerImagePrompt: content.bannerImagePrompt ?? '',
                     },
                   })
                 }

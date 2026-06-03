@@ -225,13 +225,45 @@ function AnalyzeSkeleton() {
 }
 
 // ─── GenerateSkeleton ─────────────────────────────────────────────────────────
+// Hiển thị progress steps trong khi chờ BE tạo ảnh (5-90 giây)
 
 function GenerateSkeleton() {
+  const [step, setStep] = React.useState(0);
+  const steps = [
+    'Đang phân tích yêu cầu...',
+    'AI đang tạo ảnh (có thể mất 30s)...',
+    'Đang xử lý và tối ưu ảnh...',
+    'Sắp xong rồi...',
+  ];
+
+  React.useEffect(() => {
+    const timers = [
+      setTimeout(() => setStep(1), 2000),
+      setTimeout(() => setStep(2), 12000),
+      setTimeout(() => setStep(3), 45000),
+    ];
+    return () => timers.forEach(clearTimeout);
+  }, []);
+
   return (
     <Card variant="elevated" className="items-center py-8">
-      <SkeletonLoader height={200} width="100%" borderRadius={12} style={{ marginBottom: 16 }} />
-      <SkeletonLoader height={14} width="60%" borderRadius={7} style={{ marginBottom: 8 }} />
-      <SkeletonLoader height={12} width="80%" borderRadius={6} />
+      <ActivityIndicator size="large" color="#111827" />
+      <Text className="text-sm font-medium text-gray-700 mt-4 text-center">
+        {steps[step]}
+      </Text>
+      {/* Progress dots */}
+      <View className="flex-row mt-3" style={{ gap: 6 }}>
+        {steps.map((_, i) => (
+          <View
+            key={i}
+            className={`h-1.5 rounded-full ${i <= step ? 'bg-primary-500' : 'bg-gray-200'}`}
+            style={{ width: i <= step ? 16 : 8 }}
+          />
+        ))}
+      </View>
+      <Text className="text-xs text-gray-400 mt-3 text-center px-4">
+        Pollinations AI đang render ảnh.{'\n'}Vui lòng đợi, không tắt màn hình.
+      </Text>
     </Card>
   );
 }
@@ -389,6 +421,7 @@ export default function ImageGeneratorScreen() {
     contentText?: string;
     platform?: string;
     contentHistoryId?: string;
+    bannerImagePrompt?: string;
   }>();
 
   const platform = params.platform ?? 'Facebook';
@@ -399,6 +432,8 @@ export default function ImageGeneratorScreen() {
   const contentHistoryId = params.contentHistoryId
     ? parseInt(params.contentHistoryId, 10)
     : undefined;
+  // bannerImagePrompt từ content generation — dùng làm draftPrompt hint khi analyze
+  const bannerImagePrompt = params.bannerImagePrompt || undefined;
 
   // Platform có thể được user thay đổi trước khi analyze
   const [selectedPlatform, setSelectedPlatform] = useState(platform);
@@ -490,7 +525,8 @@ export default function ImageGeneratorScreen() {
         contentText,
         contentHistoryId,
         platform: selectedPlatform,
-        draftPrompt: analyzeResult.draftPrompt,
+        // Ưu tiên draftPrompt từ AI analyze; fallback về bannerImagePrompt từ content gen
+        draftPrompt: analyzeResult.draftPrompt || bannerImagePrompt || '',
         detectedIndustry: analyzeResult.detectedIndustry,
         answers,
       },
