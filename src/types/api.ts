@@ -289,7 +289,7 @@ export interface OrderStatusResponse {
 export interface SubscriptionResponse {
   userId: number;
   tier: string;
-  status: 'Active' | 'None';
+  status: 'Active' | 'NoSubscription' | 'Expired' | 'Cancelled' | 'None';
   startedAt: string | null;
   expiresAt: string | null;
   daysRemaining: number | null;

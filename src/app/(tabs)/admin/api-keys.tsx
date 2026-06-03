@@ -27,7 +27,7 @@ import type { ApiKeyItem, CreateApiKeyRequest, UpdateApiKeyRequest } from '@/typ
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-const PROVIDERS = ['openrouter', 'groq', 'openai', 'gemini', 'pollinations'] as const;
+const PROVIDERS = ['openrouter', 'groq', 'openai', 'gemini', 'huggingface', 'pollinations'] as const;
 type Provider = (typeof PROVIDERS)[number];
 
 const PROVIDER_COLORS: Record<Provider, { bg: string; text: string }> = {
@@ -35,6 +35,7 @@ const PROVIDER_COLORS: Record<Provider, { bg: string; text: string }> = {
   groq:         { bg: 'bg-orange-100', text: 'text-orange-700' },
   openai:       { bg: 'bg-emerald-100', text: 'text-emerald-700' },
   gemini:       { bg: 'bg-blue-100', text: 'text-blue-700' },
+  huggingface:  { bg: 'bg-yellow-100', text: 'text-yellow-700' },
   pollinations: { bg: 'bg-pink-100', text: 'text-pink-700' },
 };
 
@@ -163,9 +164,11 @@ function KeyFormFields({ state, onChange, showKeyField, modelSuggestions }: KeyF
             value={state.keyValue}
             onChangeText={(v) => {
               onChange({ keyValue: v });
-              // Auto-detect Pollinations từ prefix sk_
+              // Auto-detect provider từ key prefix
               if (v.startsWith('sk_') && state.provider !== 'pollinations') {
                 onChange({ keyValue: v, provider: 'pollinations', supportsImageGen: true });
+              } else if (v.startsWith('hf_') && state.provider !== 'huggingface') {
+                onChange({ keyValue: v, provider: 'huggingface', supportsImageGen: true });
               }
             }}
             placeholder="sk-or-v1-... / gsk_... / sk_..."
@@ -179,6 +182,14 @@ function KeyFormFields({ state, onChange, showKeyField, modelSuggestions }: KeyF
               <Text className="text-xs">🖼</Text>
               <Text className="text-xs text-pink-600 font-medium">
                 Pollinations key — đã tự động bật Image Generation
+              </Text>
+            </View>
+          )}
+          {state.keyValue.startsWith('hf_') && (
+            <View className="flex-row items-center mt-1.5" style={{ gap: 4 }}>
+              <Text className="text-xs">🤗</Text>
+              <Text className="text-xs text-yellow-600 font-medium">
+                HuggingFace key — đã tự động bật Image Generation
               </Text>
             </View>
           )}

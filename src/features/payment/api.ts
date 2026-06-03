@@ -32,8 +32,15 @@ export async function getPaymentHistory(
   page: number,
   pageSize: number
 ): Promise<PaginatedPaymentHistory> {
-  const res = await apiClient.get<PaginatedPaymentHistory>('/payment/history', {
+  const res = await apiClient.get<any>('/payment/history', {
     params: { page, pageSize },
   });
-  return res.data;
+  const raw = res.data;
+  // BE trả về { total, data: [...] }, map về format FE expect
+  return {
+    totalCount: raw.totalCount ?? raw.total ?? 0,
+    page: raw.page ?? page,
+    pageSize: raw.pageSize ?? pageSize,
+    items: raw.items ?? raw.data ?? [],
+  };
 }
