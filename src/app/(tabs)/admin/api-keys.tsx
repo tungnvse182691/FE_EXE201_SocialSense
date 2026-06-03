@@ -80,6 +80,53 @@ function ProviderSelector({ value, onChange }: ProviderSelectorProps) {
   );
 }
 
+// ─── Static model fallback (từ SETUP_AI_KEYS.md — dùng khi BE chưa trả về) ──
+
+type ModelEntry = {
+  provider: string;
+  modelId: string;
+  displayName: string;
+  supportsImageGen: boolean;
+  isFree: boolean;
+  notes: string;
+};
+
+const STATIC_MODELS: ModelEntry[] = [
+  // ── OpenRouter — Text FREE ────────────────────────────────────────────────
+  { provider: 'openrouter', modelId: 'meta-llama/llama-4-scout',                    displayName: 'LLaMA 4 Scout',              supportsImageGen: false, isFree: true,  notes: 'Mặc định, nhanh' },
+  { provider: 'openrouter', modelId: 'meta-llama/llama-4-maverick',                 displayName: 'LLaMA 4 Maverick',           supportsImageGen: false, isFree: true,  notes: 'Mạnh hơn Scout' },
+  { provider: 'openrouter', modelId: 'google/gemini-2.0-flash-exp:free',            displayName: 'Gemini 2.0 Flash (free)',    supportsImageGen: false, isFree: true,  notes: 'Tiếng Việt xuất sắc' },
+  { provider: 'openrouter', modelId: 'google/gemini-2.5-flash-preview:free',        displayName: 'Gemini 2.5 Flash (free)',    supportsImageGen: false, isFree: true,  notes: 'Preview mới nhất' },
+  { provider: 'openrouter', modelId: 'deepseek/deepseek-r1:free',                   displayName: 'DeepSeek R1 (free)',         supportsImageGen: false, isFree: true,  notes: 'Reasoning tốt' },
+  { provider: 'openrouter', modelId: 'deepseek/deepseek-chat-v3-0324:free',         displayName: 'DeepSeek Chat V3 (free)',    supportsImageGen: false, isFree: true,  notes: 'Chat nhanh' },
+  { provider: 'openrouter', modelId: 'mistralai/mistral-7b-instruct:free',          displayName: 'Mistral 7B (free)',          supportsImageGen: false, isFree: true,  notes: 'Nhẹ, nhanh' },
+  { provider: 'openrouter', modelId: 'qwen/qwen3-235b-a22b:free',                   displayName: 'Qwen3 235B (free)',          supportsImageGen: false, isFree: true,  notes: 'Đa ngôn ngữ tốt' },
+  { provider: 'openrouter', modelId: 'meta-llama/llama-3.3-70b-instruct:free',      displayName: 'LLaMA 3.3 70B (free)',       supportsImageGen: false, isFree: true,  notes: 'Chất lượng cao' },
+  // ── OpenRouter — Image FREE ───────────────────────────────────────────────
+  { provider: 'openrouter', modelId: 'x-ai/grok-imagine-image-quality',             displayName: 'Grok Imagine (FREE 2K/4K)', supportsImageGen: true,  isFree: true,  notes: 'Ảnh photorealistic miễn phí' },
+  // ── OpenRouter — Image Paid ───────────────────────────────────────────────
+  { provider: 'openrouter', modelId: 'black-forest-labs/flux-schnell',              displayName: 'FLUX Schnell',               supportsImageGen: true,  isFree: false, notes: 'Nhanh, chất lượng cao' },
+  { provider: 'openrouter', modelId: 'black-forest-labs/flux.2-klein-4b',           displayName: 'FLUX.2 Klein 4B',            supportsImageGen: true,  isFree: false, notes: 'Compact, hiệu quả' },
+  { provider: 'openrouter', modelId: 'black-forest-labs/flux-1.1-pro',              displayName: 'FLUX 1.1 Pro',               supportsImageGen: true,  isFree: false, notes: 'Chất lượng cao nhất' },
+  { provider: 'openrouter', modelId: 'openai/dall-e-3',                             displayName: 'DALL-E 3 (via OR)',          supportsImageGen: true,  isFree: false, notes: 'OpenAI qua OpenRouter' },
+  // ── Groq — Text FREE ──────────────────────────────────────────────────────
+  { provider: 'groq',       modelId: 'meta-llama/llama-4-scout-17b-16e-instruct',   displayName: 'LLaMA 4 Scout 17B',         supportsImageGen: false, isFree: true,  notes: 'Nhanh nhất trên Groq' },
+  { provider: 'groq',       modelId: 'llama-3.3-70b-versatile',                     displayName: 'LLaMA 3.3 70B Versatile',   supportsImageGen: false, isFree: true,  notes: 'Chất lượng cao' },
+  { provider: 'groq',       modelId: 'llama-3.1-8b-instant',                        displayName: 'LLaMA 3.1 8B Instant',      supportsImageGen: false, isFree: true,  notes: 'Siêu nhanh' },
+  { provider: 'groq',       modelId: 'qwen/qwen3-32b',                              displayName: 'Qwen3 32B',                  supportsImageGen: false, isFree: true,  notes: 'Đa ngôn ngữ' },
+  // ── HuggingFace — Image FREE/Paid ────────────────────────────────────────
+  { provider: 'huggingface', modelId: 'black-forest-labs/FLUX.1-schnell',           displayName: 'FLUX.1 Schnell (HF)',        supportsImageGen: true,  isFree: true,  notes: 'Miễn phí với HF token' },
+  { provider: 'huggingface', modelId: 'black-forest-labs/FLUX.1-dev',               displayName: 'FLUX.1 Dev (HF)',            supportsImageGen: true,  isFree: false, notes: 'Cần HF Pro' },
+  { provider: 'huggingface', modelId: 'stabilityai/stable-diffusion-xl-base-1.0',   displayName: 'SDXL Base (HF)',             supportsImageGen: true,  isFree: true,  notes: 'Stable Diffusion XL' },
+  { provider: 'huggingface', modelId: 'stabilityai/sdxl-turbo',                     displayName: 'SDXL Turbo (HF)',            supportsImageGen: true,  isFree: true,  notes: 'Cực nhanh 1-step' },
+  // ── OpenAI ────────────────────────────────────────────────────────────────
+  { provider: 'openai',     modelId: 'gpt-4o-mini',                                 displayName: 'GPT-4o Mini',                supportsImageGen: false, isFree: false, notes: 'Nhanh, giá rẻ' },
+  { provider: 'openai',     modelId: 'gpt-4o',                                      displayName: 'GPT-4o',                     supportsImageGen: false, isFree: false, notes: 'Chất lượng cao nhất' },
+  { provider: 'openai',     modelId: 'dall-e-3',                                    displayName: 'DALL-E 3',                   supportsImageGen: true,  isFree: false, notes: 'Ảnh chất lượng cao' },
+  // ── Pollinations ─────────────────────────────────────────────────────────
+  { provider: 'pollinations', modelId: 'flux',                                      displayName: 'Flux (Pollinations)',        supportsImageGen: true,  isFree: true,  notes: 'Miễn phí, không cần key' },
+];
+
 // ─── ModelSuggestInput ────────────────────────────────────────────────────────
 
 interface ModelSuggestInputProps {
@@ -90,8 +137,19 @@ interface ModelSuggestInputProps {
 }
 
 function ModelSuggestInput({ value, onChange, provider, suggestions }: ModelSuggestInputProps) {
-  // allModels từ BE đã có field `provider` — lọc theo đúng provider thay vì prefix modelId
-  const filtered = suggestions.filter((m) => m.provider === provider);
+  const [showAll, setShowAll] = useState(false);
+
+  // Merge: ưu tiên suggestions từ API, fallback về STATIC_MODELS
+  const merged: ModelEntry[] = suggestions.length > 0
+    ? suggestions.map((s) => {
+        const found = STATIC_MODELS.find((m) => m.modelId === s.modelId);
+        return found ?? { ...s, supportsImageGen: false, isFree: false, notes: '' };
+      })
+    : STATIC_MODELS;
+
+  const filtered = merged.filter((m) => m.provider === provider);
+  const visible = showAll ? filtered : filtered.slice(0, 6);
+
   return (
     <View>
       <Text className="text-xs text-gray-500 mb-1.5">Model Override (tùy chọn)</Text>
@@ -104,20 +162,56 @@ function ModelSuggestInput({ value, onChange, provider, suggestions }: ModelSugg
         autoCorrect={false}
       />
       {filtered.length > 0 && (
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          <View className="flex-row" style={{ gap: 6 }}>
-            {filtered.slice(0, 5).map((m) => (
+        <View style={{ gap: 6 }}>
+          <View className="flex-row flex-wrap" style={{ gap: 6 }}>
+            {visible.map((m) => (
               <TouchableOpacity
                 key={m.modelId}
                 onPress={() => onChange(m.modelId)}
-                className="bg-gray-100 px-2.5 py-1 rounded-lg"
                 activeOpacity={0.7}
+                className={`flex-row items-center px-2.5 py-1.5 rounded-lg border ${
+                  value === m.modelId
+                    ? 'bg-primary-500 border-primary-500'
+                    : 'bg-gray-50 border-gray-200'
+                }`}
               >
-                <Text className="text-xs text-gray-700" numberOfLines={1}>{m.displayName}</Text>
+                {/* FREE tag */}
+                {m.isFree && (
+                  <View className="bg-green-100 px-1 py-0.5 rounded mr-1">
+                    <Text className="text-[9px] text-green-700 font-bold">FREE</Text>
+                  </View>
+                )}
+                {/* Image tag */}
+                {m.supportsImageGen && (
+                  <Text className="text-[10px] mr-1">🖼</Text>
+                )}
+                <Text
+                  className={`text-xs font-medium ${
+                    value === m.modelId ? 'text-white' : 'text-gray-700'
+                  }`}
+                  numberOfLines={1}
+                >
+                  {m.displayName}
+                </Text>
               </TouchableOpacity>
             ))}
           </View>
-        </ScrollView>
+          {/* Show more / less */}
+          {filtered.length > 6 && (
+            <TouchableOpacity onPress={() => setShowAll((p) => !p)} activeOpacity={0.7}>
+              <Text className="text-xs text-primary-500 font-medium">
+                {showAll ? '▲ Rút gọn' : `▼ Xem thêm ${filtered.length - 6} model`}
+              </Text>
+            </TouchableOpacity>
+          )}
+          {/* notes của model đang chọn */}
+          {value && (() => {
+            const selected = filtered.find((m) => m.modelId === value);
+            return selected?.notes ? (
+              <Text className="text-xs text-gray-400 italic">{selected.notes}</Text>
+            ) : null;
+          })()}
+        </View>
       )}
     </View>
   );
