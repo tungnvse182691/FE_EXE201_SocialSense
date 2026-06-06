@@ -1,5 +1,4 @@
 import React from 'react';
-import { useColorScheme } from 'react-native';
 import { useColorScheme as useNativeWindColorScheme } from 'nativewind';
 
 interface ThemeProviderProps {
@@ -11,14 +10,12 @@ interface ThemeProviderProps {
  * Wrap this around the app root so `dark:` classes respond to system preference.
  */
 export function ThemeProvider({ children }: ThemeProviderProps) {
-  const systemScheme = useColorScheme();
   const { setColorScheme } = useNativeWindColorScheme();
 
   React.useEffect(() => {
-    // 'unspecified' is not a valid NativeWind scheme — fall back to 'light'
-    const scheme = systemScheme === 'dark' ? 'dark' : 'light';
-    setColorScheme(scheme);
-  }, [systemScheme, setColorScheme]);
+    // Force light mode — dark mode is not fully supported in this version
+    setColorScheme('light');
+  }, [setColorScheme]);
 
   return <>{children}</>;
 }

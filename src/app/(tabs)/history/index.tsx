@@ -57,15 +57,15 @@ function HistoryItemCard({ item, onPress }: HistoryItemCardProps) {
     <TouchableOpacity
       onPress={() => onPress(item)}
       activeOpacity={0.7}
-      className="bg-white rounded-2xl p-4 mb-3 border border-gray-100"
+      className="bg-white dark:bg-gray-800 rounded-2xl p-4 mb-3 border border-gray-100 dark:border-gray-700"
       style={{ shadowColor: '#000', shadowOpacity: 0.04, shadowRadius: 4, elevation: 2 }}
     >
       {/* Header: date + edited badge */}
       <View className="flex-row items-center justify-between mb-2">
-        <Text className="text-xs text-gray-400">{formattedDate}</Text>
+        <Text className="text-xs text-gray-400 dark:text-gray-500">{formattedDate}</Text>
         {item.isEdited && (
-          <View className="bg-amber-100 px-2 py-0.5 rounded-full">
-            <Text className="text-xs text-amber-600 font-medium">Đã chỉnh sửa</Text>
+          <View className="bg-amber-100 dark:bg-amber-900/30 px-2 py-0.5 rounded-full">
+            <Text className="text-xs text-amber-600 dark:text-amber-400 font-medium">Đã chỉnh sửa</Text>
           </View>
         )}
       </View>
@@ -73,15 +73,15 @@ function HistoryItemCard({ item, onPress }: HistoryItemCardProps) {
       {/* Platform chips */}
       <View className="flex-row flex-wrap gap-1 mb-2">
         {uniquePlatforms.map((p) => (
-          <View key={p} className="flex-row items-center bg-gray-100 px-2 py-0.5 rounded-full">
+          <View key={p} className="flex-row items-center bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded-full">
             <Text className="text-xs mr-1">{PLATFORM_ICONS[p] ?? '📄'}</Text>
-            <Text className="text-xs text-gray-600">{p}</Text>
+            <Text className="text-xs text-gray-600 dark:text-gray-300">{p}</Text>
           </View>
         ))}
       </View>
 
       {/* Hook preview */}
-      <Text className="text-sm text-gray-800 font-medium" numberOfLines={2}>
+      <Text className="text-sm text-gray-800 dark:text-gray-100 font-medium" numberOfLines={2}>
         {hook || 'Không có nội dung'}
       </Text>
 

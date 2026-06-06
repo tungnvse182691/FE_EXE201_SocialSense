@@ -2,11 +2,13 @@ import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
-  ScrollView,
   TextInput,
   TouchableOpacity,
   ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as DocumentPicker from 'expo-document-picker';
@@ -361,7 +363,13 @@ export default function KnowledgeScreen() {
       </View>
 
       {/* Tab Content */}
-      <View className="flex-1 p-4">
+      <KeyboardAwareScrollView
+        className="flex-1 p-4"
+        contentContainerStyle={{ paddingBottom: 80 }}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+        bottomOffset={16}
+      >
         {activeTab === 'manual' && (
           <ManualTab onSuccess={(msg) => showToast(msg)} onError={(msg) => showToast(msg, 'error')} />
         )}
@@ -371,7 +379,7 @@ export default function KnowledgeScreen() {
         {activeTab === 'file' && (
           <FileTab onSuccess={(msg) => showToast(msg)} onError={(msg) => showToast(msg, 'error')} />
         )}
-      </View>
+      </KeyboardAwareScrollView>
     </SafeAreaView>
   );
 }

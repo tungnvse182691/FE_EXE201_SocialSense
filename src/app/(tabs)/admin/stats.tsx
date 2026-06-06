@@ -2,11 +2,13 @@ import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
-  ScrollView,
   TouchableOpacity,
   TextInput,
   ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useCompareStats } from '@/features/admin/hooks';
@@ -94,10 +96,12 @@ export default function StatsScreen() {
         <Text className="text-lg font-semibold text-gray-900">So sánh thống kê</Text>
       </View>
 
-      <ScrollView
+      <KeyboardAwareScrollView
         className="flex-1"
-        contentContainerStyle={{ padding: 16, paddingBottom: 40 }}
+        contentContainerStyle={{ padding: 16, paddingBottom: 80 }}
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+        bottomOffset={16}
       >
         {/* Period Type Selector */}
         <View className="mb-4">
@@ -204,7 +208,7 @@ export default function StatsScreen() {
             />
           </Card>
         )}
-      </ScrollView>
+      </KeyboardAwareScrollView>
     </SafeAreaView>
   );
 }

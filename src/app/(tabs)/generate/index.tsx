@@ -4,11 +4,11 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  ScrollView,
   Modal,
   FlatList,
   ActivityIndicator,
 } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 import { useGenerateContent } from '@/features/content/hooks';
@@ -101,10 +101,11 @@ export default function GenerateScreen() {
 
   return (
     <>
-      <ScrollView
+      <KeyboardAwareScrollView
         className="flex-1 bg-white"
         contentContainerStyle={{ paddingBottom: 120 }}
         keyboardShouldPersistTaps="handled"
+        bottomOffset={16}
       >
         <View className="px-5 pt-14 pb-4">
           <Text className="text-2xl font-bold text-gray-900">Tạo nội dung ✨</Text>
@@ -264,7 +265,7 @@ export default function GenerateScreen() {
             </Text>
           )}
         </View>
-      </ScrollView>
+      </KeyboardAwareScrollView>
 
       {/* Trend Picker Modal */}
       <Modal

@@ -45,7 +45,7 @@ export function ScreenWrapper({
     <SafeAreaView className="flex-1 bg-white dark:bg-gray-900" style={style}>
       <KeyboardAvoidingView
         className="flex-1"
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         {content}
       </KeyboardAvoidingView>

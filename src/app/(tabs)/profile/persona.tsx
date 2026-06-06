@@ -2,12 +2,11 @@
 import {
   View,
   Text,
-  ScrollView,
   TextInput,
   TouchableOpacity,
   ActivityIndicator,
-  Alert,
 } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { usePersona, useUpdatePersona } from '@/features/persona/hooks';
@@ -190,10 +189,12 @@ export default function PersonaScreen() {
         <Text className="text-lg font-semibold text-gray-900">Persona thương hiệu</Text>
       </View>
 
-      <ScrollView
+      <KeyboardAwareScrollView
         className="flex-1"
-        contentContainerStyle={{ padding: 16, paddingBottom: 40 }}
+        contentContainerStyle={{ padding: 16, paddingBottom: 80 }}
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+        bottomOffset={16}
       >
         {/* Job Title */}
         <View className="mb-4">
@@ -303,7 +304,7 @@ export default function PersonaScreen() {
             Lưu thay đổi
           </Button>
         </View>
-      </ScrollView>
+      </KeyboardAwareScrollView>
     </SafeAreaView>
   );
 }

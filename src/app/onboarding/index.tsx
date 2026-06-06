@@ -4,10 +4,10 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  ScrollView,
   ActivityIndicator,
   Alert,
 } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuthStore } from '@/features/auth/store';
@@ -39,12 +39,6 @@ const QUESTIONS = [
     placeholder: 'VD: Chuyên nghiệp nhưng gần gũi, tạo cảm giác tin tưởng, dùng số liệu thực tế.',
     hint: 'Tone of voice bạn muốn thể hiện trong nội dung',
   },
-  {
-    id: 5,
-    title: 'Ràng buộc nội dung',
-    placeholder: 'VD: Không đề cập dự án tranh chấp pháp lý, không cam kết lợi nhuận cụ thể.',
-    hint: 'Những điều bạn KHÔNG muốn AI đề cập (có thể bỏ qua)',
-  },
 ];
 
 export default function OnboardingScreen() {
@@ -53,7 +47,7 @@ export default function OnboardingScreen() {
   const insets = useSafeAreaInsets();
 
   const [currentStep, setCurrentStep] = useState(0);
-  const [answers, setAnswers] = useState<string[]>(Array(5).fill(''));
+  const [answers, setAnswers] = useState<string[]>(Array(4).fill(''));
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [persona, setPersona] = useState<PersonaProfile | null>(null);
   const [showConfirmation, setShowConfirmation] = useState(false);
@@ -171,9 +165,10 @@ export default function OnboardingScreen() {
         </View>
       </View>
 
-      <ScrollView
+      <KeyboardAwareScrollView
         className="flex-1 px-6"
         keyboardShouldPersistTaps="handled"
+        bottomOffset={16}
         contentContainerStyle={{ paddingTop: 16, paddingBottom: 8 }}
       >
         <View>
@@ -213,7 +208,7 @@ export default function OnboardingScreen() {
             ))}
           </View>
         </View>
-      </ScrollView>
+      </KeyboardAwareScrollView>
 
       {/* Navigation Buttons */}
       <View
