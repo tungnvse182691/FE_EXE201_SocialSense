@@ -165,6 +165,12 @@ export default function TabsLayout() {
         <Tabs.Screen name="profile/payment/plans" options={{ href: null }} />
         <Tabs.Screen name="profile/payment/checkout" options={{ href: null }} />
         <Tabs.Screen name="profile/payment/history" options={{ href: null }} />
+
+        {/* ── Analytics routes (hidden from tab bar) ── */}
+        <Tabs.Screen name="analytics/index" options={{ href: null }} />
+        <Tabs.Screen name="analytics/form" options={{ href: null }} />
+        <Tabs.Screen name="analytics/result" options={{ href: null }} />
+        <Tabs.Screen name="analytics/history" options={{ href: null }} />
       </Tabs>
 
       {/* Quota Exceeded Bottom Sheet */}
@@ -180,7 +186,7 @@ export default function TabsLayout() {
           <Text style={styles.sheetEmoji}>⚡</Text>
           <Text style={styles.sheetTitle}>Bạn đã dùng hết lượt hôm nay</Text>
           <Text style={styles.sheetDesc}>
-            Nâng cấp lên Pro (50 lượt/ngày) hoặc Enterprise để tạo thêm nội dung ngay hôm nay.
+            Nâng cấp lên gói Pro để tạo thêm 50 nội dung mỗi ngày.
           </Text>
           <TouchableOpacity style={styles.upgradeBtn} onPress={handleUpgradePress}>
             <Text style={styles.upgradeBtnText}>Nâng cấp ngay →</Text>

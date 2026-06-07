@@ -67,7 +67,7 @@ export interface UserProfile {
   email: string;
   displayName: string;
   hasContext: boolean;
-  tier: 'Free' | 'Pro' | 'Enterprise';
+  tier: 'Free' | 'Pro' | 'Ultra' | 'Enterprise';
   dailyQuotaLimit: number;
   remainingQuota: number;
   isUnlimited: boolean;
@@ -76,7 +76,7 @@ export interface UserProfile {
 
 export interface QuotaResponse {
   userId: number;
-  tier: 'Free' | 'Pro' | 'Enterprise';
+  tier: 'Free' | 'Pro' | 'Ultra' | 'Enterprise';
   dailyQuotaLimit: number;
   remainingQuota: number;
   usedToday: number;
@@ -241,7 +241,7 @@ export interface KnowledgeResponse {
 
 // ─── Payment ─────────────────────────────────────────────────────────────────
 
-export type PaymentTier = 'Pro' | 'Enterprise';
+export type PaymentTier = 'Pro' | 'Ultra';
 export type OrderStatus = 'Pending' | 'Paid' | 'Cancelled' | 'Expired';
 
 export interface PaymentPlan {
@@ -483,6 +483,114 @@ export interface ImageGenerateResponse {
   bannerSpecs: BannerSpecs;
   isGenerated: boolean;
   promptUsageTip: string | null;
+}
+
+// ─── Analytics ───────────────────────────────────────────────────────────────
+
+export type AnalyticsPlatform = 'TikTok' | 'Facebook' | 'Instagram' | 'YouTube';
+export type AnalyticsReportType = 'single' | 'compare';
+export type AnalyticsMetricStatus = 'good' | 'warning' | 'critical' | 'neutral';
+export type AnalyticsOverallTrend = 'growing' | 'stable' | 'declining';
+
+/** Bộ số liệu 1 kỳ — chỉ truyền field có dữ liệu, null sẽ không phân tích */
+export interface AnalyticsMetrics {
+  platform: AnalyticsPlatform;
+  periodLabel: string;
+  reach?: number | null;
+  impressions?: number | null;
+  totalEngagement?: number | null;
+  likes?: number | null;
+  comments?: number | null;
+  shares?: number | null;
+  clicks?: number | null;
+  newFollowers?: number | null;
+  profileVisits?: number | null;
+  engagementRate?: number | null;
+  completionRate?: number | null;
+  avgViewDurationSeconds?: number | null;
+  conversionRate?: number | null;
+  clickThroughRate?: number | null;
+  postsCount?: number | null;
+}
+
+/** Request body cho /analytics/analyze */
+export interface AnalyzeRequest {
+  metrics: AnalyticsMetrics;
+}
+
+/** Request body cho /analytics/compare */
+export interface CompareRequest {
+  periodA: AnalyticsMetrics;
+  periodB: AnalyticsMetrics;
+}
+
+/** Từng chỉ số trong kết quả */
+export interface AnalyticsMetricItem {
+  metricKey: string;
+  metricName: string;
+  valueAFormatted: string;
+  valueBFormatted: string | null;   // null nếu single report
+  changePercent: number | null;     // null nếu single report
+  status: AnalyticsMetricStatus;
+  simpleExplain: string;
+  detail: string;
+  higherIsBetter: boolean;
+}
+
+/** Summary section */
+export interface AnalyticsSummary {
+  highlights: string[];
+  warnings: string[];
+  overallScore: number;             // 0–100
+  overallTrend: AnalyticsOverallTrend;
+  topRecommendation: string;
+}
+
+/** Nội dung chi tiết của 1 report (nested trong AnalyticsReportResponse.result) */
+export interface AnalyticsResult {
+  platform: AnalyticsPlatform;
+  reportType: AnalyticsReportType;
+  periodALabel: string;
+  periodBLabel: string | null;
+  metrics: AnalyticsMetricItem[];
+  summary: AnalyticsSummary;
+  aiNarrative: string;
+}
+
+/** Response từ /analyze, /compare, /upload-and-compare, /history/{id} */
+export interface AnalyticsReportResponse {
+  id: number;
+  platform: AnalyticsPlatform;
+  reportType: AnalyticsReportType;
+  periodALabel: string;
+  periodBLabel: string | null;
+  createdAt: string;
+  result: AnalyticsResult;
+}
+
+/** Item trong danh sách lịch sử (/analytics/history) */
+export interface AnalyticsHistoryItem {
+  id: number;
+  platform: AnalyticsPlatform;
+  reportType: AnalyticsReportType;
+  periodALabel: string;
+  periodBLabel: string | null;
+  overallScore: number;
+  overallTrend: AnalyticsOverallTrend;
+  createdAt: string;
+}
+
+export interface AnalyticsHistoryResponse {
+  page: number;
+  pageSize: number;
+  data: AnalyticsHistoryItem[];
+}
+
+/** Response từ /analytics/upload */
+export interface AnalyticsUploadResponse {
+  message: string;
+  periodA: AnalyticsMetrics;
+  periodB: AnalyticsMetrics | null;
 }
 
 // ─── Common ──────────────────────────────────────────────────────────────────

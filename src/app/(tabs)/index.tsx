@@ -156,6 +156,25 @@ export default function DashboardScreen() {
           </TouchableOpacity>
         </View>
 
+        {/* Analytics Banner */}
+        <TouchableOpacity
+          className="bg-gray-50 border border-gray-200 rounded-2xl p-4 flex-row items-center mb-5"
+          style={{ gap: 12 }}
+          onPress={() => router.push('/(tabs)/analytics')}
+          activeOpacity={0.85}
+        >
+          <View className="w-10 h-10 bg-gray-200 rounded-xl items-center justify-center">
+            <MaterialIcons name="bar-chart" size={22} color="#111827" />
+          </View>
+          <View className="flex-1">
+            <Text className="text-gray-900 font-semibold text-base">Phân tích Analytics</Text>
+            <Text className="text-gray-500 text-xs mt-0.5">
+              AI giải thích số liệu · So sánh 2 kỳ · Gợi ý hành động
+            </Text>
+          </View>
+          <MaterialIcons name="arrow-forward" size={20} color="#9CA3AF" />
+        </TouchableOpacity>
+
         {/* Quick Links */}
         <Text className="text-base font-semibold text-gray-900 mb-3">Khám phá</Text>
         <View className="flex-row" style={{ gap: 12 }}>
