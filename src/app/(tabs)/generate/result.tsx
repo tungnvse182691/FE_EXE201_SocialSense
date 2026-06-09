@@ -9,6 +9,7 @@ import {
   Dimensions,
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import { MaterialIcons } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
 import { useContentStore } from '@/features/content/store';
 import { Toast } from '@/components/ui/Toast';
@@ -80,8 +81,9 @@ function ContentCard({ item, index, total, onCopy, onShare, onImage }: ContentCa
       </View>
 
       {/* Best time to post */}
-      <View className="bg-amber-50 rounded-xl px-3 py-2 mb-4">
-        <Text className="text-xs text-amber-700">⏰ {item.bestTimeToPost}</Text>
+      <View className="flex-row items-center gap-2 bg-amber-50 rounded-xl px-3 py-2 mb-4">
+        <MaterialIcons name="schedule" size={13} color="#92400E" />
+        <Text className="text-xs text-amber-700 flex-1">{item.bestTimeToPost}</Text>
       </View>
 
       <View className="h-px bg-gray-100 mb-3" />
@@ -93,7 +95,7 @@ function ContentCard({ item, index, total, onCopy, onShare, onImage }: ContentCa
           style={{ gap: 4 }}
           onPress={onCopy}
         >
-          <Text className="text-sm">📋</Text>
+          <MaterialIcons name="content-copy" size={14} color="#374151" />
           <Text className="text-sm font-medium text-gray-700">Sao chép</Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -101,20 +103,20 @@ function ContentCard({ item, index, total, onCopy, onShare, onImage }: ContentCa
           style={{ gap: 4 }}
           onPress={onShare}
         >
-          <Text className="text-sm">↗</Text>
+          <MaterialIcons name="share" size={14} color="#374151" />
           <Text className="text-sm font-medium text-gray-700">Chia sẻ</Text>
         </TouchableOpacity>
       </View>
 
       {/* Image banner shortcut */}
       <TouchableOpacity
-        className="mt-2 border border-primary-200 bg-primary-50 rounded-xl py-2.5 items-center flex-row justify-center"
+        className="mt-2 border border-gray-200 bg-gray-50 rounded-xl py-2.5 items-center flex-row justify-center"
         style={{ gap: 6 }}
         onPress={onImage}
         activeOpacity={0.7}
       >
-        <Text className="text-sm">🖼</Text>
-        <Text className="text-sm font-medium text-primary-600">Tạo ảnh banner</Text>
+        <MaterialIcons name="image" size={15} color="#374151" />
+        <Text className="text-sm font-medium text-gray-700">Tạo ảnh banner</Text>
       </TouchableOpacity>
     </View>
   );
@@ -196,9 +198,9 @@ export default function GenerateResultScreen() {
 
       {/* TrendBased info */}
       {selectedTrendTitle && (
-        <View className="mx-5 mb-3 bg-primary-50 rounded-xl px-4 py-3">
-          <Text className="text-xs font-semibold text-primary-600 mb-0.5">
-            📈 {selectedTrendTitle}
+        <View className="mx-5 mb-3 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3">
+          <Text className="text-xs font-semibold text-gray-700 mb-0.5">
+            {selectedTrendTitle}
           </Text>
           {smartMatchReason ? (
             <Text className="text-xs text-gray-500">{smartMatchReason}</Text>
@@ -245,10 +247,8 @@ export default function GenerateResultScreen() {
               router.push({
                 pathname: '/(tabs)/generate/image',
                 params: {
-                  // Encode \n thành \\n để truyền qua Expo Router params an toàn
                   contentText: [item.hook, item.body, item.cta].join('\\n\\n'),
                   platform: item.platform,
-                  // Truyền bannerImagePrompt để dùng làm draftPrompt khi analyze
                   bannerImagePrompt: item.bannerImagePrompt ?? '',
                 },
               })
@@ -257,17 +257,8 @@ export default function GenerateResultScreen() {
         )}
       />
 
-      {/* Brand Alignment shortcut */}
-      <View className="px-5 pb-8 pt-4">
-        <TouchableOpacity
-          className="border border-primary-200 rounded-xl py-3 items-center"
-          onPress={() => router.push('/(tabs)/generate/alignment')}
-        >
-          <Text className="text-primary-500 font-medium text-sm">
-            🎯 Kiểm tra Brand Alignment
-          </Text>
-        </TouchableOpacity>
-      </View>
+      {/* Bottom spacer */}
+      <View className="pb-8" />
     </View>
   );
 }

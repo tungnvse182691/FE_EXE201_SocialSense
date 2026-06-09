@@ -159,18 +159,6 @@ export interface GenerateContentResponse {
   smartMatchReason: string;
 }
 
-export interface CheckAlignmentRequest {
-  draftContent: string;
-}
-
-export interface CheckAlignmentResponse {
-  brandScore: number;
-  analysis: string;
-  /** Gợi ý cải thiện — BE trả về string (có thể chứa nhiều dòng) */
-  suggestions: string;
-  refinedContent: string;
-}
-
 export interface ContentHistoryItem {
   id: number;
   userId: number;

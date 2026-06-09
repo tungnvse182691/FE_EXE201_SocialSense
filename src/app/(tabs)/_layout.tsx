@@ -153,7 +153,6 @@ export default function TabsLayout() {
         />
 
         {/* ── Hidden sub-routes (not tabs, but need to be declared) ── */}
-        <Tabs.Screen name="generate/alignment" options={{ href: null }} />
         <Tabs.Screen name="generate/result" options={{ href: null }} />
         <Tabs.Screen name="generate/image" options={{ href: null }} />
         <Tabs.Screen name="history/[id]" options={{ href: null }} />

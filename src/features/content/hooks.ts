@@ -1,12 +1,11 @@
 import { useMutation, useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
-import { generateContent, checkAlignment, getHistory, editHistory, analyzeImageContent, generateImage } from './api';
+import { generateContent, getHistory, editHistory, analyzeImageContent, generateImage } from './api';
 import { useContentStore } from './store';
 import { useAuthStore } from '@/features/auth/store';
 import { authKeys } from '@/features/auth/hooks';
 import { Config } from '@/constants/config';
 import type {
   GenerateContentRequest,
-  CheckAlignmentRequest,
   EditHistoryRequest,
   ImageAnalyzeRequest,
   ImageGenerateRequest,
@@ -39,14 +38,6 @@ export function useGenerateContent() {
       setGenerating(false);
       clearResult();
     },
-  });
-}
-
-// ─── useCheckAlignment ────────────────────────────────────────────────────────
-
-export function useCheckAlignment() {
-  return useMutation({
-    mutationFn: (data: CheckAlignmentRequest) => checkAlignment(data),
   });
 }
 

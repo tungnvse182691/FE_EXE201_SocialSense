@@ -2,8 +2,6 @@ import apiClient from '@/lib/api';
 import type {
   GenerateContentRequest,
   GenerateContentResponse,
-  CheckAlignmentRequest,
-  CheckAlignmentResponse,
   PaginatedHistoryResponse,
   EditHistoryRequest,
   ImageAnalyzeRequest,
@@ -16,13 +14,6 @@ export async function generateContent(
   data: GenerateContentRequest
 ): Promise<GenerateContentResponse> {
   const res = await apiClient.post<GenerateContentResponse>('/content/generate', data);
-  return res.data;
-}
-
-export async function checkAlignment(
-  data: CheckAlignmentRequest
-): Promise<CheckAlignmentResponse> {
-  const res = await apiClient.post<CheckAlignmentResponse>('/content/check-alignment', data);
   return res.data;
 }
 
