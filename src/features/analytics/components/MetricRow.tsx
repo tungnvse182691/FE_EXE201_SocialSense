@@ -117,7 +117,7 @@ export function MetricRow({ metric }: MetricRowProps) {
         <MaterialIcons
           name={expanded ? 'expand-less' : 'expand-more'}
           size={18}
-          color="#9CA3AF"
+          color={metric.detail ? '#9CA3AF' : 'transparent'}
         />
       </View>
 
