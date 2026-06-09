@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -175,34 +175,7 @@ export default function DashboardScreen() {
           <MaterialIcons name="arrow-forward" size={20} color="#9CA3AF" />
         </TouchableOpacity>
 
-        {/* Quick Links */}
-        <Text className="text-base font-semibold text-gray-900 mb-3">Khám phá</Text>
-        <View className="flex-row" style={{ gap: 12 }}>
-          <TouchableOpacity
-            className="flex-1 bg-gray-50 border border-gray-200 rounded-2xl p-3 items-center"
-            style={{ gap: 6 }}
-            onPress={() => router.push('/(tabs)/trends')}
-          >
-            <MaterialIcons name="trending-up" size={26} color="#111827" />
-            <Text className="text-xs font-medium text-gray-700">Xu hướng</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            className="flex-1 bg-gray-50 border border-gray-200 rounded-2xl p-3 items-center"
-            style={{ gap: 6 }}
-            onPress={() => router.push('/(tabs)/history')}
-          >
-            <MaterialIcons name="history" size={26} color="#111827" />
-            <Text className="text-xs font-medium text-gray-700">Lịch sử</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            className="flex-1 bg-gray-50 border border-gray-200 rounded-2xl p-3 items-center"
-            style={{ gap: 6 }}
-            onPress={() => router.push('/(tabs)/profile')}
-          >
-            <MaterialIcons name="person" size={26} color="#111827" />
-            <Text className="text-xs font-medium text-gray-700">Hồ sơ</Text>
-          </TouchableOpacity>
-        </View>
+
       </View>
     </ScrollView>
   );
