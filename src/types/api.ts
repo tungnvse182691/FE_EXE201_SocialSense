@@ -196,6 +196,7 @@ export interface TrendItem {
   title: string;
   summary: string;
   sourceUrl: string;
+  sourceName: string;
   hotLevel: number;
   createdAt: string;
   tags: TagItem[];
