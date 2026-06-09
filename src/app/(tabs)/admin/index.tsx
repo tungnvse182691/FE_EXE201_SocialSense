@@ -111,7 +111,7 @@ export default function AdminDashboardScreen() {
             label="Nội dung đã tạo"
             value={data?.totalContentGenerated ?? 0}
           />
-          <StatCard iconName="menu-book" label="Knowledge items" value={data?.totalKnowledgeItems ?? 0} />
+          <StatCard iconName="menu-book" label="Tài liệu tham khảo" value={data?.totalKnowledgeItems ?? 0} />
         </View>
         <View className="flex-row gap-3 mb-4">
           <StatCard

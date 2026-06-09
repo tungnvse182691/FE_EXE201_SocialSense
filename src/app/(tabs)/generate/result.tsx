@@ -229,7 +229,8 @@ export default function GenerateResultScreen() {
         showsHorizontalScrollIndicator={false}
         snapToInterval={SCREEN_WIDTH - 40 + 12}
         decelerationRate="fast"
-        contentContainerStyle={{ paddingHorizontal: 20, gap: 12 }}
+        style={{ flex: 1 }}
+        contentContainerStyle={{ paddingHorizontal: 20, gap: 12, alignItems: 'flex-start', paddingBottom: 32 }}
         onMomentumScrollEnd={(e) => {
           const index = Math.round(
             e.nativeEvent.contentOffset.x / (SCREEN_WIDTH - 40 + 12)
@@ -257,8 +258,7 @@ export default function GenerateResultScreen() {
         )}
       />
 
-      {/* Bottom spacer */}
-      <View className="pb-8" />
+      {/* Bottom spacer đã được handle bởi paddingBottom trong FlatList */}
     </View>
   );
 }

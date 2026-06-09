@@ -130,7 +130,7 @@ export default function ChangePasswordScreen() {
       {/* Header */}
       <View className="flex-row items-center px-4 pt-2 pb-3 bg-white border-b border-gray-100">
         <TouchableOpacity
-          onPress={() => router.back()}
+          onPress={() => router.navigate('/(tabs)/profile' as any)}
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           className="mr-3"
         >

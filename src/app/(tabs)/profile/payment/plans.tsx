@@ -17,16 +17,21 @@ interface PlanCardProps {
 }
 
 function PlanCard({ plan, currentTier, onUpgrade }: PlanCardProps) {
-  const isCurrent = plan.tier === currentTier;
-  const isFree = plan.tier === 'Free';
+  // Normalize cả 2 phía: Enterprise → Ultra để so sánh đúng
+  const normalizedPlanTier = plan.tier === 'Enterprise' ? 'Ultra' : plan.tier;
+  const normalizedCurrentTier = currentTier === 'Enterprise' ? 'Ultra' : currentTier;
+
+  const isCurrent = normalizedPlanTier === normalizedCurrentTier;
+  const isFree = normalizedPlanTier === 'Free';
 
   const tierColors: Record<string, { bg: string; border: string; text: string }> = {
-    Free: { bg: 'bg-gray-50', border: 'border-gray-200', text: 'text-gray-700' },
-    Pro: { bg: 'bg-primary-50', border: 'border-primary-500', text: 'text-primary-700' },
-    Enterprise: { bg: 'bg-amber-50', border: 'border-amber-500', text: 'text-amber-700' },
+    Free:  { bg: 'bg-gray-50',    border: 'border-gray-200',   text: 'text-gray-700'   },
+    Pro:   { bg: 'bg-primary-50', border: 'border-primary-500', text: 'text-primary-700' },
+    Ultra: { bg: 'bg-amber-50',   border: 'border-amber-500',  text: 'text-amber-700'  },
   };
 
-  const colors = tierColors[plan.tier] ?? tierColors.Free;
+  const colors = tierColors[normalizedPlanTier] ?? tierColors.Free;
+  const displayTier = normalizedPlanTier; // luôn hiển thị "Ultra", không bao giờ "Enterprise"
 
   return (
     <Card
@@ -36,7 +41,7 @@ function PlanCard({ plan, currentTier, onUpgrade }: PlanCardProps) {
       {/* Header */}
       <View className="flex-row items-center justify-between mb-3">
         <View>
-          <Text className={`text-xl font-bold ${colors.text}`}>{plan.tier}</Text>
+          <Text className={`text-xl font-bold ${colors.text}`}>{displayTier}</Text>
           {isCurrent && (
             <View className="bg-green-100 px-2 py-0.5 rounded-full mt-1">
               <Text className="text-xs text-green-700 font-medium">Gói hiện tại</Text>
@@ -107,7 +112,7 @@ export default function PlansScreen() {
       {/* Header */}
       <View className="flex-row items-center px-4 pt-2 pb-3 bg-white border-b border-gray-100">
         <TouchableOpacity
-          onPress={() => router.back()}
+          onPress={() => router.navigate('/(tabs)/profile/subscription' as any)}
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           className="mr-3"
         >

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import type { TrendItem } from '@/types/api';
 
 interface TrendCardProps {
@@ -17,27 +17,33 @@ function getHotLevelConfig(level: number) {
   return { bg: 'bg-gray-50', text: 'text-gray-500', border: 'border-gray-200', label: `${level}` };
 }
 
-export function TrendCard({ trend, onGeneratePress }: TrendCardProps) {
+// ✅ Style object đặt ngoài component → không bị tạo lại mỗi render
+const styles = StyleSheet.create({
+  card: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  tagsRow: { gap: 4 },
+});
+
+export const TrendCard = React.memo(function TrendCard({ trend, onGeneratePress }: TrendCardProps) {
   const hotConfig = getHotLevelConfig(trend.hotLevel);
 
   return (
     <View
       className="bg-white border border-gray-100 rounded-2xl p-4 mb-3"
-      style={{ shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 2, elevation: 1 }}
+      style={styles.card}
     >
-      {/* Header: hot badge + source */}
+      {/* Header: hot badge */}
       <View className="flex-row items-center justify-between mb-2">
         <View className={`px-2.5 py-1 rounded-full border ${hotConfig.bg} ${hotConfig.border}`}>
           <Text className={`text-xs font-semibold ${hotConfig.text}`}>
             {hotConfig.label}
           </Text>
         </View>
-        {/* Source badge — kiểu chip xám nhỏ giống tag */}
-        {trend.sourceName ? (
-          <View className="bg-gray-100 px-2 py-0.5 rounded-full">
-            <Text className="text-xs text-gray-500">{trend.sourceName}</Text>
-          </View>
-        ) : null}
       </View>
 
       {/* Title */}
@@ -52,7 +58,7 @@ export function TrendCard({ trend, onGeneratePress }: TrendCardProps) {
 
       {/* Tags + Action button */}
       <View className="flex-row items-center justify-between">
-        <View className="flex-row flex-wrap flex-1 mr-2" style={{ gap: 4 }}>
+        <View className="flex-row flex-wrap flex-1 mr-2" style={styles.tagsRow}>
           {trend.tags.slice(0, 3).map((tag) => (
             <View key={tag.id} className="bg-gray-100 px-2 py-0.5 rounded-full">
               <Text className="text-xs text-gray-600 font-medium">{tag.name}</Text>
@@ -69,4 +75,4 @@ export function TrendCard({ trend, onGeneratePress }: TrendCardProps) {
       </View>
     </View>
   );
-}
+});

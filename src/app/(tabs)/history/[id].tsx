@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { MaterialIcons } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
 import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getHistory, editHistory } from '@/features/content/api';
@@ -24,14 +25,7 @@ import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
 
 // ─── Platform icon map ────────────────────────────────────────────────────────
-
-const PLATFORM_ICONS: Record<string, string> = {
-  Facebook: '📘',
-  Instagram: '📸',
-  TikTok: '🎵',
-  Zalo: '💬',
-  LinkedIn: '💼',
-};
+// (removed — không dùng emoji icon nữa)
 
 // ─── ContentBlock ─────────────────────────────────────────────────────────────
 
@@ -149,36 +143,31 @@ interface ContentCardProps {
 }
 
 function ContentCard({ content, historyId, onCopyAll, onShare, onEdit, onImage }: ContentCardProps) {
-  const platformIcon = PLATFORM_ICONS[content.platform] ?? '📄';
-
   return (
     <Card variant="outlined" className="mb-4">
       {/* Platform header */}
       <View className="flex-row items-center justify-between mb-4 pb-3 border-b border-gray-100">
-        <View className="flex-row items-center gap-2">
-          <Text className="text-lg">{platformIcon}</Text>
-          <Text className="text-base font-semibold text-gray-900">{content.platform}</Text>
-        </View>
+        <Text className="text-base font-semibold text-gray-900">{content.platform}</Text>
         <View className="flex-row gap-2">
           <TouchableOpacity
             onPress={onCopyAll}
             className="bg-gray-100 px-3 py-1.5 rounded-lg flex-row items-center gap-1"
           >
-            <Text className="text-sm">📋</Text>
+            <MaterialIcons name="content-copy" size={13} color="#374151" />
             <Text className="text-xs text-gray-700 font-medium">Copy</Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={onShare}
             className="bg-gray-100 px-3 py-1.5 rounded-lg flex-row items-center gap-1"
           >
-            <Text className="text-sm">↗</Text>
+            <MaterialIcons name="share" size={13} color="#374151" />
             <Text className="text-xs text-gray-700 font-medium">Chia sẻ</Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={onEdit}
             className="bg-primary-50 px-3 py-1.5 rounded-lg flex-row items-center gap-1"
           >
-            <Text className="text-sm">✏️</Text>
+            <MaterialIcons name="edit" size={13} color="#2563EB" />
             <Text className="text-xs text-primary-600 font-medium">Sửa</Text>
           </TouchableOpacity>
         </View>
@@ -205,20 +194,20 @@ function ContentCard({ content, historyId, onCopyAll, onShare, onEdit, onImage }
       {/* Best time to post */}
       {content.bestTimeToPost ? (
         <View className="flex-row items-center gap-2 bg-amber-50 px-3 py-2 rounded-xl">
-          <Text className="text-sm">⏰</Text>
+          <MaterialIcons name="schedule" size={14} color="#92400E" />
           <Text className="text-xs text-amber-700 font-medium">{content.bestTimeToPost}</Text>
         </View>
       ) : null}
 
       {/* Image banner shortcut */}
       <TouchableOpacity
-        className="mt-3 border border-primary-200 bg-primary-50 rounded-xl py-2.5 items-center flex-row justify-center"
+        className="mt-3 border border-gray-200 bg-gray-50 rounded-xl py-2.5 items-center flex-row justify-center"
         style={{ gap: 6 }}
         onPress={onImage}
         activeOpacity={0.7}
       >
-        <Text className="text-sm">🖼</Text>
-        <Text className="text-sm font-medium text-primary-600">Tạo ảnh banner</Text>
+        <MaterialIcons name="image" size={16} color="#374151" />
+        <Text className="text-sm font-medium text-gray-700">Tạo ảnh banner</Text>
       </TouchableOpacity>
     </Card>
   );
@@ -380,7 +369,7 @@ export default function HistoryDetailScreen() {
       {/* Header */}
       <View className="flex-row items-center px-4 pt-2 pb-3 bg-white border-b border-gray-100">
         <TouchableOpacity
-          onPress={() => router.back()}
+          onPress={() => router.navigate('/(tabs)/history' as any)}
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           className="mr-3"
         >

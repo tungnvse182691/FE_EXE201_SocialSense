@@ -21,7 +21,7 @@ import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Toast } from '@/components/ui/Toast';
 
-const TIERS = ['Free', 'Pro', 'Enterprise'];
+const TIERS = ['Free', 'Pro', 'Ultra'];
 
 // ─── TierPickerModal ──────────────────────────────────────────────────────────
 
@@ -176,7 +176,7 @@ function UserDetailContent({ userId }: { userId: number }) {
       <Toast visible={toast.visible} message={toast.message} type={toast.type} onHide={hideToast} />
       <TierPickerModal
         visible={showTierPicker}
-        currentTier={user.tier}
+        currentTier={user.tier === 'Enterprise' ? 'Ultra' : user.tier}
         onSelect={handleTierSelect}
         onClose={() => setShowTierPicker(false)}
       />
@@ -207,7 +207,7 @@ function UserDetailContent({ userId }: { userId: number }) {
           </Text>
           <InfoRow label="Email" value={user.email} />
           <InfoRow label="Tên hiển thị" value={user.displayName} />
-          <InfoRow label="Gói dịch vụ" value={user.tier} />
+          <InfoRow label="Gói dịch vụ" value={user.tier === 'Enterprise' ? 'Ultra' : user.tier} />
           <InfoRow label="Trạng thái" value={user.isActive ? 'Hoạt động' : 'Vô hiệu hóa'} />
           <InfoRow label="Quota hôm nay" value={`${user.remainingQuota}/${user.dailyQuotaLimit}`} />
           <InfoRow label="Tổng nội dung" value={String(user.totalContentGenerated)} />
@@ -226,7 +226,7 @@ function UserDetailContent({ userId }: { userId: number }) {
             onPress={() => setShowTierPicker(true)}
             loading={isUpdatingTier}
           >
-            🎯 Đổi gói dịch vụ (hiện: {user.tier})
+            Đổi gói dịch vụ (hiện: {user.tier === 'Enterprise' ? 'Ultra' : user.tier})
           </Button>
 
           <Button variant="outline" onPress={handleResetQuota} loading={isResettingQuota}>

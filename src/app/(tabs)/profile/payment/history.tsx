@@ -142,7 +142,7 @@ export default function PaymentHistoryScreen() {
       {/* Header */}
       <View className="flex-row items-center px-4 pt-2 pb-3 bg-white border-b border-gray-100">
         <TouchableOpacity
-          onPress={() => router.back()}
+          onPress={() => router.navigate('/(tabs)/profile' as any)}
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           className="mr-3"
         >
@@ -174,7 +174,7 @@ export default function PaymentHistoryScreen() {
         onEndReachedThreshold={0.3}
         ListEmptyComponent={
           <EmptyState
-            icon="💳"
+            iconName="receipt-long"
             title="Chưa có giao dịch"
             description="Lịch sử thanh toán sẽ hiển thị tại đây"
           />

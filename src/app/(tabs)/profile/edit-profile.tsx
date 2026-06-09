@@ -9,6 +9,7 @@ import {
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { MaterialIcons } from '@expo/vector-icons';
 import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -78,7 +79,7 @@ export default function EditProfileScreen() {
       {/* Header */}
       <View className="flex-row items-center px-4 pt-2 pb-3 bg-white border-b border-gray-100">
         <TouchableOpacity
-          onPress={() => router.back()}
+          onPress={() => router.navigate('/(tabs)/profile' as any)}
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           className="mr-3"
         >
@@ -96,8 +97,8 @@ export default function EditProfileScreen() {
       >
           {/* Avatar + current info */}
           <Card variant="elevated" className="mb-6 items-center py-5">
-            <View className="w-20 h-20 bg-primary-100 rounded-full items-center justify-center mb-3">
-              <Text className="text-3xl">👤</Text>
+            <View className="w-20 h-20 bg-gray-100 rounded-full items-center justify-center mb-3">
+              <MaterialIcons name="person" size={40} color="#374151" />
             </View>
             <Text className="text-sm text-gray-500">{user?.email ?? ''}</Text>
           </Card>

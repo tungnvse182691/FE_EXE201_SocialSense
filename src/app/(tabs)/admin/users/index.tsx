@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { MaterialIcons } from '@expo/vector-icons';
 import { useAdminUsers } from '@/features/admin/hooks';
 import { CardSkeleton } from '@/components/ui/SkeletonLoader';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -26,7 +27,7 @@ function UserRow({ user, onPress }: UserRowProps) {
   const tierColors: Record<string, string> = {
     Free: 'text-gray-500',
     Pro: 'text-primary-600',
-    Enterprise: 'text-amber-600',
+    Ultra: 'text-amber-600',
   };
 
   return (
@@ -35,8 +36,8 @@ function UserRow({ user, onPress }: UserRowProps) {
       activeOpacity={0.7}
       className="bg-white px-4 py-3 border-b border-gray-100 flex-row items-center"
     >
-      <View className="w-10 h-10 bg-primary-50 rounded-full items-center justify-center mr-3">
-        <Text className="text-base">👤</Text>
+      <View className="w-10 h-10 bg-gray-100 rounded-full items-center justify-center mr-3">
+        <MaterialIcons name="person" size={20} color="#374151" />
       </View>
       <View className="flex-1">
         <Text className="text-sm font-semibold text-gray-900" numberOfLines={1}>
@@ -157,7 +158,7 @@ export default function AdminUsersScreen() {
         onEndReached={handleLoadMore}
         onEndReachedThreshold={0.3}
         ListEmptyComponent={
-          <EmptyState icon="👥" title="Không tìm thấy người dùng" />
+          <EmptyState iconName="group" title="Không tìm thấy người dùng" />
         }
         ListFooterComponent={
           isFetchingNextPage ? (

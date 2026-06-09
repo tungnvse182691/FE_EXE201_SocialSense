@@ -24,6 +24,7 @@ export default function SubscriptionScreen() {
   }
 
   const isActive = subscription?.isActive ?? false;
+  const normalizedTier = subscription?.tier === 'Enterprise' ? 'Ultra' : (subscription?.tier ?? 'Free');
   const expiryDate = subscription?.expiresAt
     ? format(new Date(subscription.expiresAt), 'dd/MM/yyyy', { locale: vi })
     : null;
@@ -33,7 +34,7 @@ export default function SubscriptionScreen() {
       {/* Header */}
       <View className="flex-row items-center px-4 pt-2 pb-3 bg-white border-b border-gray-100">
         <TouchableOpacity
-          onPress={() => router.back()}
+          onPress={() => router.navigate('/(tabs)/profile' as any)}
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           className="mr-3"
         >
@@ -51,7 +52,7 @@ export default function SubscriptionScreen() {
         <Card variant="elevated" className="mb-4">
           <Text className="text-xs text-gray-400 uppercase tracking-wide mb-2">Gói hiện tại</Text>
           <View className="flex-row items-center justify-between mb-4">
-            <TierBadge tier={(subscription?.tier as any) ?? 'Free'} />
+            <TierBadge tier={(normalizedTier as any)} />
             <View
               className={`px-3 py-1 rounded-full ${
                 isActive ? 'bg-green-100' : 'bg-gray-100'
@@ -93,14 +94,7 @@ export default function SubscriptionScreen() {
             variant="primary"
             onPress={() => router.push('/(tabs)/profile/payment/plans' as any)}
           >
-            {subscription?.tier === 'Free' ? 'Nâng cấp gói' : 'Thay đổi gói'}
-          </Button>
-
-          <Button
-            variant="outline"
-            onPress={() => router.push('/(tabs)/profile/payment/history' as any)}
-          >
-            Xem lịch sử thanh toán
+            {normalizedTier === 'Free' ? 'Nâng cấp gói' : 'Thay đổi gói'}
           </Button>
         </View>
       </ScrollView>

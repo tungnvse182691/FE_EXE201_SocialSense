@@ -108,7 +108,7 @@ export default function GenerateScreen() {
         bottomOffset={16}
       >
         <View className="px-5 pt-14 pb-4">
-          <Text className="text-2xl font-bold text-gray-900">Tạo nội dung ✨</Text>
+          <Text className="text-2xl font-bold text-gray-900">Tạo nội dung</Text>
           <Text className="text-sm text-gray-500 mt-0.5">AI sẽ tạo bài đăng phù hợp với thương hiệu của bạn</Text>
         </View>
 
@@ -128,7 +128,7 @@ export default function GenerateScreen() {
                     mode === m ? 'text-primary-600' : 'text-gray-500'
                   }`}
                 >
-                  {m === 'TrendBased' ? '📈 Xu hướng' : '✨ Persona'}
+                  {m === 'TrendBased' ? 'Xu hướng' : 'Persona'}
                 </Text>
               </TouchableOpacity>
             ))}
@@ -255,7 +255,7 @@ export default function GenerateScreen() {
                   canGenerate ? 'text-white' : 'text-gray-400'
                 }`}
               >
-                ✨ Tạo nội dung
+                Tạo nội dung
               </Text>
             )}
           </TouchableOpacity>
@@ -312,7 +312,7 @@ export default function GenerateScreen() {
                 </Text>
                 <View className="flex-row items-center mt-1" style={{ gap: 6 }}>
                   <Text className="text-xs text-orange-500 font-medium">
-                    🔥 {item.hotLevel}
+                    {item.hotLevel >= 8 ? `HOT ${item.hotLevel}` : item.hotLevel}
                   </Text>
                   {item.tags.slice(0, 2).map((tag) => (
                     <Text key={tag.id} className="text-xs text-gray-400">
@@ -346,7 +346,7 @@ export default function GenerateScreen() {
             Bạn đã dùng hết lượt hôm nay
           </Text>
           <Text style={{ fontSize: 14, color: '#6B7280', textAlign: 'center', lineHeight: 20, marginBottom: 20 }}>
-            Nâng cấp lên Pro (50 lượt/ngày) hoặc Enterprise để tạo thêm nội dung ngay hôm nay.
+            Nâng cấp lên gói Pro để tạo thêm nội dung mỗi ngày.
           </Text>
           <TouchableOpacity
             style={{ backgroundColor: '#111827', borderRadius: 12, paddingVertical: 14, width: '100%', alignItems: 'center', marginBottom: 10 }}

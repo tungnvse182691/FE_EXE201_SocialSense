@@ -305,13 +305,22 @@ export default function KnowledgeScreen() {
       {/* Header */}
       <View className="flex-row items-center px-4 pt-2 pb-3 bg-white border-b border-gray-100">
         <TouchableOpacity
-          onPress={() => router.back()}
+          onPress={() => router.navigate('/(tabs)/profile' as any)}
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           className="mr-3"
         >
           <Text className="text-primary-500 text-base font-medium">← Quay lại</Text>
         </TouchableOpacity>
-        <Text className="text-lg font-semibold text-gray-900">Knowledge Base</Text>
+        <Text className="text-lg font-semibold text-gray-900">Tài liệu tham khảo</Text>
+      </View>
+
+      {/* Mô tả tính năng */}
+      <View className="bg-blue-50 mx-4 mt-3 mb-1 px-4 py-3 rounded-xl border border-blue-100">
+        <Text className="text-sm font-semibold text-blue-800 mb-1">Tính năng này dùng để làm gì?</Text>
+        <Text className="text-xs text-blue-700 leading-5">
+          Thêm thông tin về sản phẩm, dịch vụ hoặc lĩnh vực của bạn vào đây.
+          AI sẽ dùng để tạo nội dung chính xác và phù hợp hơn với bạn.
+        </Text>
       </View>
 
       {/* Segmented Control */}

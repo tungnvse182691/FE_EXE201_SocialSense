@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { MaterialIcons } from '@expo/vector-icons';
 import { useContentHistory } from '@/features/content/hooks';
 import { CardSkeleton } from '@/components/ui/SkeletonLoader';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -17,15 +18,15 @@ import type { ContentHistoryItem, GeneratedContentItem } from '@/types/api';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
 
-// ─── Platform icon map ────────────────────────────────────────────────────────
+// ─── Platform chip — text only, no emoji ─────────────────────────────────────
 
-const PLATFORM_ICONS: Record<string, string> = {
-  Facebook: '📘',
-  Instagram: '📸',
-  TikTok: '🎵',
-  Zalo: '💬',
-  LinkedIn: '💼',
-};
+function PlatformChip({ platform }: { platform: string }) {
+  return (
+    <View className="bg-gray-100 px-2 py-0.5 rounded-full">
+      <Text className="text-xs text-gray-600 font-medium">{platform}</Text>
+    </View>
+  );
+}
 
 // ─── HistoryItemCard ──────────────────────────────────────────────────────────
 
@@ -43,13 +44,11 @@ function HistoryItemCard({ item, onPress }: HistoryItemCardProps) {
 
   const hook = displayContent.hook ?? '';
   const platform = displayContent.platform ?? firstContent.platform ?? '';
-  const platformIcon = PLATFORM_ICONS[platform] ?? '📄';
 
   const formattedDate = item.createdAt
     ? format(new Date(item.createdAt), 'dd/MM/yyyy HH:mm', { locale: vi })
     : '';
 
-  // Tất cả platforms trong batch
   const platforms = item.generatedContent.map((c) => c.platform);
   const uniquePlatforms = [...new Set(platforms)];
 
@@ -70,13 +69,10 @@ function HistoryItemCard({ item, onPress }: HistoryItemCardProps) {
         )}
       </View>
 
-      {/* Platform chips */}
+      {/* Platform chips — text only */}
       <View className="flex-row flex-wrap gap-1 mb-2">
         {uniquePlatforms.map((p) => (
-          <View key={p} className="flex-row items-center bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded-full">
-            <Text className="text-xs mr-1">{PLATFORM_ICONS[p] ?? '📄'}</Text>
-            <Text className="text-xs text-gray-600 dark:text-gray-300">{p}</Text>
-          </View>
+          <PlatformChip key={p} platform={p} />
         ))}
       </View>
 
@@ -85,7 +81,6 @@ function HistoryItemCard({ item, onPress }: HistoryItemCardProps) {
         {hook || 'Không có nội dung'}
       </Text>
 
-      {/* Footer: edit icon */}
       <View className="flex-row items-center justify-end mt-2">
         <Text className="text-xs text-primary-500 font-medium">Xem chi tiết →</Text>
       </View>
@@ -190,7 +185,7 @@ export default function HistoryScreen() {
         onEndReachedThreshold={0.3}
         ListEmptyComponent={
           <EmptyState
-            icon="📋"
+            iconName="history"
             title="Chưa có lịch sử"
             description="Tạo nội dung đầu tiên của bạn để xem lịch sử tại đây"
             actionLabel="Tạo nội dung ngay"

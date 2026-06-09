@@ -197,7 +197,7 @@ export default function StatsScreen() {
               diffPercent={result.diff.contentGeneratedChangePercent}
             />
             <CompareRow
-              label="Knowledge items mới"
+              label="Tài liệu tham khảo mới"
               valueA={result.periodA.newKnowledgeItems}
               valueB={result.periodB.newKnowledgeItems}
             />

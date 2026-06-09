@@ -9,7 +9,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import * as DocumentPicker from 'expo-document-picker';
@@ -66,7 +66,7 @@ function formToMetrics(
   return metrics;
 }
 
-// ─── Sub: Period Form ─────────────────────────────────────────────────────────
+// ─── Sub: Period Form — layout 2 cột gọn ─────────────────────────────────────
 
 function PeriodForm({
   title,
@@ -85,43 +85,70 @@ function PeriodForm({
 }) {
   const visibleFields = FIELDS.filter((f) => !f.onlyFor || f.onlyFor.includes(platform));
 
+  // Chia thành pairs để render 2 cột
+  const pairs: (FieldDef | null)[][] = [];
+  for (let i = 0; i < visibleFields.length; i += 2) {
+    pairs.push([visibleFields[i], visibleFields[i + 1] ?? null]);
+  }
+
   return (
     <View className="mx-5 mt-3 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+      {/* Header */}
       <Text className="text-sm font-bold text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-700 px-4 py-2.5 border-b border-gray-100 dark:border-gray-600">
         {title}
       </Text>
 
-      <View className="px-4 py-3 border-b border-gray-50 dark:border-gray-700">
-        <Text className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">
-          Tên kỳ báo cáo <Text className="text-red-400">*</Text>
-        </Text>
-        <TextInput
-          className="text-sm text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-600 pb-1"
-          value={periodLabel}
-          onChangeText={onPeriodLabelChange}
-          placeholder='VD: "Tháng 6/2026"'
-          placeholderTextColor="#D1D5DB"
-        />
+      {/* Tên kỳ — full width */}
+      <View className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
+        <View className="flex-row items-center justify-between" style={{ gap: 12 }}>
+          <Text className="text-xs font-semibold text-gray-600 dark:text-gray-400" style={{ width: 110 }}>
+            Tên kỳ báo cáo <Text className="text-red-400">*</Text>
+          </Text>
+          <View className="flex-1 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-1.5">
+            <TextInput
+              className="text-sm text-gray-900 dark:text-white"
+              value={periodLabel}
+              onChangeText={onPeriodLabelChange}
+              placeholder='VD: "T6/2026"'
+              placeholderTextColor="#D1D5DB"
+            />
+          </View>
+        </View>
       </View>
 
-      {visibleFields.map((field) => (
-        <View key={field.key} className="px-4 py-3 border-b border-gray-50 dark:border-gray-700">
-          <View className="flex-row items-center gap-1 mb-1.5">
-            <Text className="text-xs font-medium text-gray-600 dark:text-gray-400">
-              {field.label}
-            </Text>
-            {field.unit && (
-              <Text className="text-xs text-gray-400 dark:text-gray-500">({field.unit})</Text>
-            )}
-          </View>
-          <TextInput
-            className="text-sm text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-600 pb-1"
-            value={values[field.key] ?? ''}
-            onChangeText={(v) => onValueChange(field.key, v)}
-            placeholder={field.placeholder}
-            placeholderTextColor="#D1D5DB"
-            keyboardType="decimal-pad"
-          />
+      {/* Grid 2 cột */}
+      {pairs.map((pair, rowIdx) => (
+        <View
+          key={rowIdx}
+          className="flex-row border-b border-gray-50 dark:border-gray-700"
+        >
+          {pair.map((field, colIdx) => (
+            <View
+              key={field?.key ?? `empty-${colIdx}`}
+              className={`flex-1 px-3 py-2.5 ${colIdx === 0 ? 'border-r border-gray-100 dark:border-gray-700' : ''}`}
+            >
+              {field ? (
+                <>
+                  {/* Label */}
+                  <Text className="text-xs text-gray-500 dark:text-gray-400 mb-1" numberOfLines={1}>
+                    {field.label}
+                    {field.unit ? <Text className="text-gray-400"> ({field.unit})</Text> : null}
+                  </Text>
+                  {/* Input ô màu cam */}
+                  <View className="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg px-2 py-1.5">
+                    <TextInput
+                      className="text-sm text-gray-900 dark:text-white"
+                      value={values[field.key] ?? ''}
+                      onChangeText={(v) => onValueChange(field.key, v)}
+                      placeholder={field.placeholder?.replace('VD: ', '') ?? ''}
+                      placeholderTextColor="#D1D5DB"
+                      keyboardType="decimal-pad"
+                    />
+                  </View>
+                </>
+              ) : null}
+            </View>
+          ))}
         </View>
       ))}
     </View>
@@ -225,6 +252,16 @@ export default function AnalyticsFormScreen() {
   const [labelB, setLabelB]     = useState('');
   const [valuesB, setValuesB]   = useState<FormValues>({});
   const [pickedFile, setPickedFile] = useState<{ uri: string; name: string; type: string } | null>(null);
+
+  useFocusEffect(
+    useCallback(() => {
+      setLabelA('');
+      setValuesA({});
+      setLabelB('');
+      setValuesB({});
+      setPickedFile(null);
+    }, [])
+  );
 
   const isLoading = compareLoading || analyzeLoading || uploadLoading;
 

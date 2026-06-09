@@ -1,4 +1,4 @@
-﻿import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
@@ -10,28 +10,23 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
-import { useTrends, useTrendTags, useRecommendedTrends } from '@/features/trends/hooks';
+import { useTrends, useTrendTags } from '@/features/trends/hooks';
 import { TrendCard } from '@/components/ui/TrendCard';
 import { CardSkeleton } from '@/components/ui/SkeletonLoader';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { AppHeader } from '@/components/layout/AppHeader';
 import type { TrendItem } from '@/types/api';
 
-// 'recommended' là mode đặc biệt, không phải tagId
-type FilterMode = number | 'recommended' | undefined;
+type FilterMode = number | undefined;
 
 export default function TrendsScreen() {
   const router = useRouter();
   const [filterMode, setFilterMode] = useState<FilterMode>(undefined);
   const [searchQuery, setSearchQuery] = useState('');
 
-  const isRecommended = filterMode === 'recommended';
-  const selectedTagId = typeof filterMode === 'number' ? filterMode : undefined;
+  const selectedTagId = filterMode;
 
-  const normalQuery = useTrends(isRecommended ? undefined : selectedTagId);
-  const recommendedQuery = useRecommendedTrends();
-
-  const activeQuery = isRecommended ? recommendedQuery : normalQuery;
+  const activeQuery = useTrends(selectedTagId);
 
   const {
     data,
@@ -46,13 +41,21 @@ export default function TrendsScreen() {
   const { data: tags } = useTrendTags();
 
   // Flatten + filter theo search
-  const allTrends: TrendItem[] = data?.pages.flatMap((p) => p.items) ?? [];
-  const trends: TrendItem[] = searchQuery.trim()
-    ? allTrends.filter((t) =>
-        t.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        t.tags.some((tag) => tag.name.toLowerCase().includes(searchQuery.toLowerCase()))
-      )
-    : allTrends;
+  const allTrends: TrendItem[] = useMemo(
+    () => data?.pages.flatMap((p) => p.items) ?? [],
+    [data]
+  );
+  const trends: TrendItem[] = useMemo(
+    () =>
+      searchQuery.trim()
+        ? allTrends.filter(
+            (t) =>
+              t.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+              t.tags.some((tag) => tag.name.toLowerCase().includes(searchQuery.toLowerCase()))
+          )
+        : allTrends,
+    [allTrends, searchQuery]
+  );
 
   const handleGeneratePress = useCallback(
     (trendId: number) => {
@@ -61,10 +64,19 @@ export default function TrendsScreen() {
     [router]
   );
 
-  const handleLoadMore = () => {
+  const handleLoadMore = useCallback(() => {
     if (searchQuery.trim()) return;
     if (hasNextPage && !isFetchingNextPage) fetchNextPage();
-  };
+  }, [searchQuery, hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  const renderItem = useCallback(
+    ({ item }: { item: TrendItem }) => (
+      <TrendCard trend={item} onGeneratePress={handleGeneratePress} />
+    ),
+    [handleGeneratePress]
+  );
+
+  const keyExtractor = useCallback((item: TrendItem) => String(item.id), []);
 
   return (
     <View className="flex-1 bg-white dark:bg-gray-900">
@@ -94,28 +106,10 @@ export default function TrendsScreen() {
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        style={{ flexShrink: 0 }}
+        style={{ height: 48, flexGrow: 0 }}
         contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 6, gap: 8, alignItems: 'center' }}
       >
-        {/* Chip: Dành cho bạn */}
-        <TouchableOpacity
-          className={`flex-row items-center px-3 py-1.5 rounded-full border ${
-            isRecommended
-              ? 'bg-primary-500 border-primary-500'
-              : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-600'
-          }`}
-          style={{ gap: 4 }}
-          onPress={() => setFilterMode(isRecommended ? undefined : 'recommended')}
-        >
-          <MaterialIcons
-            name="star"
-            size={12}
-            color={isRecommended ? '#FFFFFF' : '#9CA3AF'}
-          />
-          <Text className={`text-xs font-medium ${isRecommended ? 'text-white' : 'text-gray-600 dark:text-gray-300'}`}>
-            Dành cho bạn
-          </Text>
-        </TouchableOpacity>
+
 
         {/* Chip: Tất cả */}
         <TouchableOpacity
@@ -156,16 +150,12 @@ export default function TrendsScreen() {
         </View>
       ) : trends.length === 0 ? (
         <EmptyState
-          iconName={searchQuery ? 'search-off' : isRecommended ? 'star-border' : 'wifi-off'}
+          iconName={searchQuery ? 'search-off' : 'wifi-off'}
           title={
-            searchQuery ? `Không tìm thấy "${searchQuery}"`
-            : isRecommended ? 'Chưa có gợi ý cho bạn'
-            : 'Chưa có xu hướng nào'
+            searchQuery ? `Không tìm thấy "${searchQuery}"` : 'Chưa có xu hướng nào'
           }
           description={
-            searchQuery ? 'Thử từ khoá khác'
-            : isRecommended ? 'Hoàn thiện Persona để nhận gợi ý phù hợp hơn'
-            : 'Thử chọn tag khác hoặc quay lại sau'
+            searchQuery ? 'Thử từ khoá khác' : 'Thử chọn tag khác hoặc quay lại sau'
           }
           actionLabel={searchQuery ? 'Xoá tìm kiếm' : 'Làm mới'}
           onAction={() => searchQuery ? setSearchQuery('') : refetch()}
@@ -173,10 +163,8 @@ export default function TrendsScreen() {
       ) : (
         <FlatList
           data={trends}
-          keyExtractor={(item) => String(item.id)}
-          renderItem={({ item }) => (
-            <TrendCard trend={item} onGeneratePress={handleGeneratePress} />
-          )}
+          keyExtractor={keyExtractor}
+          renderItem={renderItem}
           contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 4, paddingBottom: 100 }}
           onRefresh={refetch}
           refreshing={isRefetching}

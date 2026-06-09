@@ -1,4 +1,4 @@
-export type Tier = 'Free' | 'Pro' | 'Enterprise';
+export type Tier = 'Free' | 'Pro' | 'Ultra' | 'Enterprise';
 
 export interface AuthUser {
   userId: number;

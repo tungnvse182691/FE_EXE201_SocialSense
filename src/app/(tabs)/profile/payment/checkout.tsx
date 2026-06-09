@@ -117,7 +117,7 @@ export default function CheckoutScreen() {
         },
         onError: () => {
           showToast('Tạo đơn hàng thất bại', 'error');
-          router.back();
+          router.navigate('/(tabs)/profile/payment/plans' as any);
         },
       }
     );
@@ -164,7 +164,7 @@ export default function CheckoutScreen() {
   const handleExpired = useCallback(() => {
     setPollingEnabled(false);
     Alert.alert('Hết hạn', 'Đơn hàng đã hết hạn. Vui lòng tạo đơn mới.', [
-      { text: 'OK', onPress: () => router.back() },
+      { text: 'OK', onPress: () => router.navigate('/(tabs)/profile/payment/plans' as any) },
     ]);
   }, [router]);
 
@@ -186,7 +186,7 @@ export default function CheckoutScreen() {
       {/* Header */}
       <View className="flex-row items-center px-4 pt-2 pb-3 bg-white border-b border-gray-100">
         <TouchableOpacity
-          onPress={() => router.back()}
+          onPress={() => router.navigate('/(tabs)/profile/payment/plans' as any)}
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           className="mr-3"
         >
