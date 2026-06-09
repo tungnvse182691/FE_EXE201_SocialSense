@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { MaterialIcons } from '@expo/vector-icons';
 import {
   useApiKeys,
   useCreateApiKey,
@@ -45,6 +46,15 @@ function providerBadgeClasses(provider: string): { bg: string; text: string } {
 }
 
 // ─── ProviderSelector ─────────────────────────────────────────────────────────
+
+const DEFAULT_MODEL_BY_PROVIDER: Record<string, { model: string; imageGen: boolean }> = {
+  openrouter:   { model: 'meta-llama/llama-4-scout',                  imageGen: false },
+  groq:         { model: 'llama-3.3-70b-versatile',                   imageGen: false },
+  openai:       { model: 'gpt-4o-mini',                               imageGen: false },
+  gemini:       { model: 'gemini-2.0-flash-exp',                      imageGen: false },
+  huggingface:  { model: 'black-forest-labs/FLUX.1-schnell',          imageGen: true  },
+  pollinations: { model: 'flux',                                      imageGen: true  },
+};
 
 interface ProviderSelectorProps {
   value: string;
@@ -199,7 +209,9 @@ function ModelSuggestInput({ value, onChange, provider, suggestions }: ModelSugg
                 )}
                 {/* Image tag */}
                 {m.supportsImageGen && (
-                  <Text className="text-[10px] mr-1">🖼</Text>
+                  <View className="bg-purple-100 px-1 py-0.5 rounded mr-1">
+                    <Text className="text-[9px] text-purple-700 font-bold">IMG</Text>
+                  </View>
                 )}
                 <Text
                   className={`text-xs font-medium ${
@@ -517,7 +529,7 @@ function ApiKeyCard({ item, onToggle, onEdit, onDelete }: ApiKeyCardProps) {
           <View className="flex-row items-center flex-wrap" style={{ gap: 6, marginBottom: 4 }}>
             <Text className="text-sm font-semibold text-gray-900">{item.label}</Text>
             {item.isEncrypted && (
-              <Text className="text-xs text-gray-400">🔒</Text>
+              <MaterialIcons name="lock" size={12} color="#9CA3AF" />
             )}
           </View>
           <View className="flex-row flex-wrap items-center" style={{ gap: 6 }}>
@@ -537,7 +549,7 @@ function ApiKeyCard({ item, onToggle, onEdit, onDelete }: ApiKeyCardProps) {
             {/* Image gen badge */}
             {item.supportsImageGen && (
               <View className="bg-purple-100 px-2 py-0.5 rounded-full">
-                <Text className="text-xs text-purple-700 font-medium">🖼 Image</Text>
+                <Text className="text-xs text-purple-700 font-medium">Ảnh</Text>
               </View>
             )}
           </View>
@@ -732,12 +744,12 @@ export default function ApiKeysScreen() {
         <View className="mb-4 flex-row" style={{ gap: 8 }}>
           <View className="flex-1">
             <Button variant="outline" onPress={handleReload} loading={isReloading}>
-              🔄 Reload Pool
+              Reload Pool
             </Button>
           </View>
           <View className="flex-1">
             <Button variant="outline" onPress={handleReloadClear} loading={isClearing}>
-              🧹 Clear Cooldown
+              Clear Cooldown
             </Button>
           </View>
         </View>
@@ -771,7 +783,9 @@ export default function ApiKeysScreen() {
           <ActivityIndicator size="large" color="#111827" />
         ) : keys?.length === 0 ? (
           <View className="items-center py-12">
-            <Text className="text-4xl mb-3">🔑</Text>
+            <View className="w-16 h-16 bg-gray-100 rounded-full items-center justify-center mb-3">
+              <MaterialIcons name="vpn-key" size={32} color="#6B7280" />
+            </View>
             <Text className="text-gray-500">Chưa có API key nào</Text>
           </View>
         ) : (
