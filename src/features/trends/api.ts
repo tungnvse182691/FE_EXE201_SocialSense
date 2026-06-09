@@ -16,3 +16,8 @@ export async function getTrendTags(): Promise<TagItem[]> {
   const res = await apiClient.get<TagItem[]>('/trends/tags');
   return res.data;
 }
+
+export async function getRecommendedTrends(params: { page: number; pageSize: number }): Promise<TrendListResponse> {
+  const res = await apiClient.get<TrendListResponse>('/trends/recommended', { params });
+  return res.data;
+}
