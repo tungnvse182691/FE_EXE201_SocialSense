@@ -37,6 +37,7 @@ const STATUS_LABEL: Record<AnalyticsMetricStatus, string> = {
 
 export function MetricRow({ metric }: MetricRowProps) {
   const [expanded, setExpanded] = useState(false);
+  const hasDetail = !!metric.detail?.trim();
 
   const hasChange  = metric.changePercent !== null && metric.changePercent !== undefined;
   const changeVal  = metric.changePercent ?? 0;
@@ -59,8 +60,8 @@ export function MetricRow({ metric }: MetricRowProps) {
 
   return (
     <TouchableOpacity
-      onPress={() => setExpanded((v) => !v)}
-      activeOpacity={0.6}
+      onPress={() => hasDetail && setExpanded((v) => !v)}
+      activeOpacity={hasDetail ? 0.6 : 1}
       className="px-4 py-3 border-b border-gray-50 dark:border-gray-700"
     >
       {/* Main row — 1 hàng ngang đầy đủ thông tin */}
@@ -114,11 +115,13 @@ export function MetricRow({ metric }: MetricRowProps) {
           </Text>
         </View>
 
-        <MaterialIcons
-          name={expanded ? 'expand-less' : 'expand-more'}
-          size={18}
-          color={metric.detail ? '#9CA3AF' : 'transparent'}
-        />
+        {hasDetail && (
+          <MaterialIcons
+            name={expanded ? 'expand-less' : 'expand-more'}
+            size={18}
+            color="#9CA3AF"
+          />
+        )}
       </View>
 
     </TouchableOpacity>
