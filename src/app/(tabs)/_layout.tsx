@@ -184,9 +184,9 @@ export default function TabsLayout() {
       >
         <BottomSheetView style={styles.sheetContent}>
           <Text style={styles.sheetEmoji}>⚡</Text>
-          <Text style={styles.sheetTitle}>Bạn đã dùng hết lượt hôm nay</Text>
+          <Text style={styles.sheetTitle}>Hết lượt tạo & phân tích hôm nay</Text>
           <Text style={styles.sheetDesc}>
-            Nâng cấp lên gói Pro để tạo thêm 50 nội dung mỗi ngày.
+            Nâng cấp lên gói Pro để có thêm 50 lượt tạo nội dung và phân tích mỗi ngày.
           </Text>
           <TouchableOpacity style={styles.upgradeBtn} onPress={handleUpgradePress}>
             <Text style={styles.upgradeBtnText}>Nâng cấp ngay →</Text>

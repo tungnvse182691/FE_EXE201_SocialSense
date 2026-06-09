@@ -6,8 +6,10 @@ import {
   TouchableOpacity,
   ScrollView,
   ActivityIndicator,
+  TextInput,
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import { MaterialIcons } from '@expo/vector-icons';
 import { useTrends, useTrendTags } from '@/features/trends/hooks';
 import { TrendCard } from '@/components/ui/TrendCard';
 import { CardSkeleton } from '@/components/ui/SkeletonLoader';
@@ -18,6 +20,7 @@ import type { TrendItem } from '@/types/api';
 export default function TrendsScreen() {
   const router = useRouter();
   const [selectedTagId, setSelectedTagId] = useState<number | undefined>(undefined);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const {
     data,
@@ -31,8 +34,14 @@ export default function TrendsScreen() {
 
   const { data: tags } = useTrendTags();
 
-  // Flatten tất cả pages thành 1 mảng
-  const trends: TrendItem[] = data?.pages.flatMap((p) => p.items) ?? [];
+  // Flatten + filter theo search query
+  const allTrends: TrendItem[] = data?.pages.flatMap((p) => p.items) ?? [];
+  const trends: TrendItem[] = searchQuery.trim()
+    ? allTrends.filter((t) =>
+        t.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        t.tags.some((tag) => tag.name.toLowerCase().includes(searchQuery.toLowerCase()))
+      )
+    : allTrends;
 
   const handleGeneratePress = useCallback(
     (trendId: number) => {
@@ -45,6 +54,8 @@ export default function TrendsScreen() {
   );
 
   const handleLoadMore = () => {
+    // Không load more khi đang search (filter local)
+    if (searchQuery.trim()) return;
     if (hasNextPage && !isFetchingNextPage) {
       fetchNextPage();
     }
@@ -55,13 +66,34 @@ export default function TrendsScreen() {
       {/* Logo Header */}
       <AppHeader title="Xu hướng" subtitle="Các chủ đề đang hot hôm nay" />
 
+      {/* Search box */}
+      <View className="px-5 pt-3 pb-2">
+        <View className="flex-row items-center bg-gray-100 dark:bg-gray-800 rounded-xl px-3 py-2.5" style={{ gap: 8 }}>
+          <MaterialIcons name="search" size={18} color="#9CA3AF" />
+          <TextInput
+            className="flex-1 text-sm text-gray-900 dark:text-white"
+            placeholder="Tìm kiếm xu hướng..."
+            placeholderTextColor="#9CA3AF"
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            returnKeyType="search"
+            clearButtonMode="while-editing"
+          />
+          {searchQuery.length > 0 && (
+            <TouchableOpacity onPress={() => setSearchQuery('')} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+              <MaterialIcons name="close" size={16} color="#9CA3AF" />
+            </TouchableOpacity>
+          )}
+        </View>
+      </View>
+
       {/* Tag Filter Bar — horizontal scroll */}
       {tags && tags.length > 0 && (
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          style={{ maxHeight: 44, marginBottom: 8 }}
-          contentContainerStyle={{ paddingHorizontal: 20, gap: 8, alignItems: 'center' }}
+          style={{ height: 52 }}
+          contentContainerStyle={{ paddingHorizontal: 20, paddingVertical: 8, gap: 8, alignItems: 'center' }}
         >
           {/* "Tất cả" option */}
           <TouchableOpacity
@@ -105,7 +137,6 @@ export default function TrendsScreen() {
 
       {/* Trend List */}
       {isLoading ? (
-        // Skeleton loader khi đang tải lần đầu
         <View className="px-4">
           {[1, 2, 3, 4].map((i) => (
             <CardSkeleton key={i} />
@@ -113,11 +144,11 @@ export default function TrendsScreen() {
         </View>
       ) : trends.length === 0 ? (
         <EmptyState
-          icon="📭"
-          title="Chưa có xu hướng nào"
-          description="Thử chọn tag khác hoặc quay lại sau"
-          actionLabel="Làm mới"
-          onAction={() => refetch()}
+          iconName={searchQuery ? 'search-off' : 'wifi-off'}
+          title={searchQuery ? `Không tìm thấy "${searchQuery}"` : 'Chưa có xu hướng nào'}
+          description={searchQuery ? 'Thử từ khoá khác' : 'Thử chọn tag khác hoặc quay lại sau'}
+          actionLabel={searchQuery ? 'Xoá tìm kiếm' : 'Làm mới'}
+          onAction={() => searchQuery ? setSearchQuery('') : refetch()}
         />
       ) : (
         <FlatList

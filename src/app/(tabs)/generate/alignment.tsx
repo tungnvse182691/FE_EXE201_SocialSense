@@ -9,6 +9,7 @@ import {
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { MaterialIcons } from '@expo/vector-icons';
 import Svg, { Circle } from 'react-native-svg';
 import * as Clipboard from 'expo-clipboard';
 import { useCheckAlignment } from '@/features/content/hooks';
@@ -147,7 +148,7 @@ export default function AlignmentScreen() {
       {/* Header */}
       <View className="flex-row items-center px-4 pt-2 pb-3 bg-white border-b border-gray-100">
         <TouchableOpacity
-          onPress={() => router.back()}
+          onPress={() => router.navigate('/(tabs)/generate/result' as any)}
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           className="mr-3"
         >
@@ -169,6 +170,31 @@ export default function AlignmentScreen() {
         {/* Input section */}
         {!result ? (
           <View>
+            {/* Giải thích Brand Alignment là gì */}
+            <View className="bg-gray-50 border border-gray-200 rounded-2xl p-4 mb-4" style={{ gap: 8 }}>
+              <View className="flex-row items-center" style={{ gap: 8 }}>
+                <View className="w-8 h-8 bg-gray-200 rounded-xl items-center justify-center">
+                  <MaterialIcons name="verified" size={16} color="#374151" />
+                </View>
+                <Text className="text-sm font-bold text-gray-900">Brand Alignment là gì?</Text>
+              </View>
+              <Text className="text-xs text-gray-500 leading-5">
+                Kiểm tra xem nội dung bài đăng của bạn có phù hợp với phong cách thương hiệu, tệp đối tượng và ngành nghề bạn đã thiết lập trong Persona không.
+              </Text>
+              <View style={{ gap: 4 }}>
+                {[
+                  'Chấm điểm độ phù hợp thương hiệu (0–100)',
+                  'Phân tích điểm mạnh và cần cải thiện',
+                  'Đề xuất bản viết lại tối ưu hơn',
+                ].map((item, i) => (
+                  <View key={i} className="flex-row items-start" style={{ gap: 6 }}>
+                    <MaterialIcons name="chevron-right" size={14} color="#9CA3AF" style={{ marginTop: 1 }} />
+                    <Text className="text-xs text-gray-500 flex-1 leading-4">{item}</Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+
             <Text className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
               Nội dung cần kiểm tra
             </Text>
@@ -181,7 +207,7 @@ export default function AlignmentScreen() {
               style={{ textAlignVertical: 'top', minHeight: 180 }}
             />
             <Button variant="primary" onPress={handleCheck} loading={isPending}>
-              {isPending ? 'Đang phân tích...' : '🔍 Kiểm tra Brand Alignment'}
+              {isPending ? 'Đang phân tích...' : 'Kiểm tra độ phù hợp'}
             </Button>
           </View>
         ) : (
@@ -220,12 +246,12 @@ export default function AlignmentScreen() {
                     <Text className="text-xs text-primary-500 font-medium">Sao chép</Text>
                   </TouchableOpacity>
                 </View>
-                <View className="bg-primary-50 rounded-xl p-3">
+                <View className="bg-gray-50 rounded-xl p-3">
                   <Text className="text-sm text-gray-800 leading-5">{result.refinedContent}</Text>
                 </View>
                 <View className="mt-3">
                   <Button variant="primary" onPress={handleCopyRefined}>
-                    ✨ Dùng bản viết lại
+                    Dùng bản viết lại
                   </Button>
                 </View>
               </Card>

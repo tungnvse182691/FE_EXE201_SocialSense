@@ -7,7 +7,6 @@ interface MetricRowProps {
   metric: AnalyticsMetricItem;
 }
 
-// Tailwind class maps — phải dùng full class string để NativeWind không bị purge
 const STATUS_DOT: Record<AnalyticsMetricStatus, string> = {
   good:     'bg-green-500',
   warning:  'bg-amber-400',
@@ -39,12 +38,11 @@ const STATUS_LABEL: Record<AnalyticsMetricStatus, string> = {
 export function MetricRow({ metric }: MetricRowProps) {
   const [expanded, setExpanded] = useState(false);
 
-  const hasChange   = metric.changePercent !== null && metric.changePercent !== undefined;
-  const changeVal   = metric.changePercent ?? 0;
-  const isPositive  = changeVal > 0;
-  const isNeutral   = changeVal === 0;
+  const hasChange  = metric.changePercent !== null && metric.changePercent !== undefined;
+  const changeVal  = metric.changePercent ?? 0;
+  const isPositive = changeVal > 0;
+  const isNeutral  = changeVal === 0;
 
-  // Màu mũi tên: dựa theo higherIsBetter
   const arrowColor: string = isNeutral
     ? '#9CA3AF'
     : metric.higherIsBetter
@@ -65,62 +63,65 @@ export function MetricRow({ metric }: MetricRowProps) {
       activeOpacity={0.6}
       className="px-4 py-3 border-b border-gray-50 dark:border-gray-700"
     >
-      {/* Main row */}
-      <View className="flex-row items-center" style={{ gap: 8 }}>
-        {/* Status dot */}
-        <View className={`w-2 h-2 rounded-full ${STATUS_DOT[metric.status]}`} />
+      {/* ── Layout 2 cột ── */}
+      <View className="flex-row items-start" style={{ gap: 10 }}>
 
-        {/* Metric name */}
-        <View className="flex-1">
-          <Text className="text-sm font-medium text-gray-800 dark:text-gray-100">
-            {metric.metricName}
-          </Text>
+        {/* Cột trái: tên + simpleExplain */}
+        <View className="flex-1" style={{ gap: 2 }}>
+          <View className="flex-row items-center" style={{ gap: 6 }}>
+            <View className={`w-2 h-2 rounded-full mt-0.5 ${STATUS_DOT[metric.status]}`} />
+            <Text className="text-sm font-medium text-gray-800 dark:text-gray-100 flex-1">
+              {metric.metricName}
+            </Text>
+          </View>
           {expanded && (
-            <Text className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 leading-4">
+            <Text className="text-xs text-gray-500 dark:text-gray-400 leading-4 pl-4">
               {metric.simpleExplain}
             </Text>
           )}
         </View>
 
-        {/* Values */}
-        <View className="items-end" style={{ minWidth: 60 }}>
-          <Text className="text-sm font-semibold text-gray-900 dark:text-white">
-            {metric.valueAFormatted}
-          </Text>
-          {metric.valueBFormatted && (
-            <Text className="text-xs text-gray-400 dark:text-gray-500">
-              {metric.valueBFormatted}
+        {/* Cột phải: giá trị + change + badge + expand icon */}
+        <View className="items-end" style={{ gap: 4 }}>
+          {/* Hàng 1: giá trị A (kỳ này) + mũi tên % */}
+          <View className="flex-row items-center" style={{ gap: 6 }}>
+            <Text className="text-sm font-bold text-gray-900 dark:text-white">
+              {metric.valueAFormatted}
             </Text>
-          )}
-        </View>
-
-        {/* Change % */}
-        {hasChange && (
-          <View className="flex-row items-center" style={{ gap: 2, minWidth: 52 }}>
-            <MaterialIcons name={arrowIcon as any} size={13} color={arrowColor} />
-            <Text className={`text-xs font-semibold ${arrowClass}`}>
-              {Math.abs(changeVal).toFixed(1)}%
-            </Text>
+            {hasChange && (
+              <View className="flex-row items-center" style={{ gap: 2 }}>
+                <MaterialIcons name={arrowIcon as any} size={12} color={arrowColor} />
+                <Text className={`text-xs font-semibold ${arrowClass}`}>
+                  {Math.abs(changeVal).toFixed(1)}%
+                </Text>
+              </View>
+            )}
+            <MaterialIcons
+              name={expanded ? 'expand-less' : 'expand-more'}
+              size={16}
+              color="#9CA3AF"
+            />
           </View>
-        )}
 
-        {/* Status badge */}
-        <View className={`px-1.5 py-0.5 rounded-md ${STATUS_BADGE_BG[metric.status]}`}>
-          <Text className={`text-xs font-semibold ${STATUS_BADGE_TEXT[metric.status]}`}>
-            {STATUS_LABEL[metric.status]}
-          </Text>
+          {/* Hàng 2: giá trị B (kỳ trước) + status badge */}
+          <View className="flex-row items-center" style={{ gap: 6 }}>
+            {metric.valueBFormatted && (
+              <Text className="text-xs text-gray-400 dark:text-gray-500">
+                {metric.valueBFormatted}
+              </Text>
+            )}
+            <View className={`px-1.5 py-0.5 rounded-md ${STATUS_BADGE_BG[metric.status]}`}>
+              <Text className={`text-xs font-semibold ${STATUS_BADGE_TEXT[metric.status]}`}>
+                {STATUS_LABEL[metric.status]}
+              </Text>
+            </View>
+          </View>
         </View>
-
-        <MaterialIcons
-          name={expanded ? 'expand-less' : 'expand-more'}
-          size={18}
-          color="#9CA3AF"
-        />
       </View>
 
-      {/* Detail (expanded) */}
+      {/* Detail khi expand */}
       {expanded && (
-        <Text className="text-xs text-gray-500 dark:text-gray-400 leading-5 mt-2 pl-5">
+        <Text className="text-xs text-gray-500 dark:text-gray-400 leading-5 mt-2 pl-4">
           {metric.detail}
         </Text>
       )}

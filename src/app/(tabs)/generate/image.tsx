@@ -2,7 +2,6 @@
 import {
   View,
   Text,
-  ScrollView,
   TextInput,
   TouchableOpacity,
   ActivityIndicator,
@@ -10,6 +9,8 @@ import {
   Image as RNImage,
   ActivityIndicator as RNActivityIndicator,
 } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
+import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
@@ -103,8 +104,8 @@ interface BannerSpecsBadgeProps {
 function BannerSpecsBadge({ platform }: BannerSpecsBadgeProps) {
   return (
     <View className="flex-row flex-wrap" style={{ gap: 6 }}>
-      <View className="bg-primary-50 border border-primary-100 px-3 py-1 rounded-full flex-row items-center" style={{ gap: 4 }}>
-        <Text className="text-xs font-semibold text-primary-600">{platform}</Text>
+      <View className="bg-gray-100 border border-gray-200 px-3 py-1 rounded-full flex-row items-center" style={{ gap: 4 }}>
+        <Text className="text-xs font-semibold text-gray-700">{platform}</Text>
       </View>
     </View>
   );
@@ -309,7 +310,7 @@ function PollinationsImage({ uri }: PollinationsImageProps) {
       )}
       {error && (
         <View style={{ height: 220, alignItems: 'center', justifyContent: 'center', padding: 16 }}>
-          <Text style={{ fontSize: 28, marginBottom: 8 }}>🖼</Text>
+          <MaterialIcons name="broken-image" size={28} color="#9CA3AF" style={{ marginBottom: 8 }} />
           <Text style={{ fontSize: 12, color: '#6B7280', textAlign: 'center', lineHeight: 18 }}>
             Không hiển thị được ảnh.{'\n'}Dùng "Sao chép prompt" để dùng với Midjourney.
           </Text>
@@ -348,7 +349,7 @@ function ResultView({ result, onCopyPrompt, onShare }: ResultViewProps) {
         />
         {result.bannerSpecs.recommendedStyle ? (
           <Text className="text-xs text-gray-500 mt-2 leading-4">
-            💡 {result.bannerSpecs.recommendedStyle}
+            {result.bannerSpecs.recommendedStyle}
           </Text>
         ) : null}
       </Card>
@@ -366,7 +367,7 @@ function ResultView({ result, onCopyPrompt, onShare }: ResultViewProps) {
               style={{ gap: 4 }}
               onPress={onShare}
             >
-              <Text className="text-sm">↗</Text>
+              <MaterialIcons name="share" size={14} color="#374151" />
               <Text className="text-sm font-medium text-gray-700">Chia sẻ</Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -374,7 +375,7 @@ function ResultView({ result, onCopyPrompt, onShare }: ResultViewProps) {
               style={{ gap: 4 }}
               onPress={onCopyPrompt}
             >
-              <Text className="text-sm">📋</Text>
+              <MaterialIcons name="content-copy" size={14} color="#2563EB" />
               <Text className="text-sm font-medium text-primary-600">Sao chép prompt</Text>
             </TouchableOpacity>
           </View>
@@ -384,7 +385,7 @@ function ResultView({ result, onCopyPrompt, onShare }: ResultViewProps) {
         <Card variant="outlined">
           <View className="flex-row items-center justify-between mb-2">
             <Text className="text-xs font-semibold text-gray-400 uppercase tracking-wide">
-              📋 Final Prompt
+              Final Prompt
             </Text>
             <TouchableOpacity onPress={onCopyPrompt}>
               <Text className="text-xs text-primary-500 font-medium">Sao chép</Text>
@@ -398,13 +399,13 @@ function ResultView({ result, onCopyPrompt, onShare }: ResultViewProps) {
           {result.promptUsageTip ? (
             <View className="bg-amber-50 rounded-xl px-3 py-2.5">
               <Text className="text-xs text-amber-700 leading-4">
-                💡 {result.promptUsageTip}
+                {result.promptUsageTip}
               </Text>
             </View>
           ) : null}
           <View className="mt-3">
             <Button variant="primary" onPress={onCopyPrompt}>
-              📋 Sao chép prompt
+              Sao chép prompt
             </Button>
           </View>
         </Card>
@@ -599,7 +600,13 @@ export default function ImageGeneratorScreen() {
       {/* Header */}
       <View className="flex-row items-center px-4 pt-2 pb-3 bg-white border-b border-gray-100">
         <TouchableOpacity
-          onPress={() => router.back()}
+          onPress={() => {
+            if (params.contentHistoryId) {
+              router.navigate(`/(tabs)/history/${params.contentHistoryId}` as any);
+            } else {
+              router.navigate('/(tabs)/generate/result' as any);
+            }
+          }}
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           className="mr-3"
         >
@@ -610,16 +617,17 @@ export default function ImageGeneratorScreen() {
           <Text className="text-xs text-gray-400">AI tạo ảnh theo nội dung của bạn</Text>
         </View>
         {/* Platform badge */}
-        <View className="bg-primary-50 border border-primary-100 px-3 py-1 rounded-full">
-          <Text className="text-xs font-semibold text-primary-600">{selectedPlatform}</Text>
+        <View className="bg-gray-100 border border-gray-200 px-3 py-1 rounded-full">
+          <Text className="text-xs font-semibold text-gray-700">{selectedPlatform}</Text>
         </View>
       </View>
 
-      <ScrollView
+      <KeyboardAwareScrollView
         className="flex-1"
         contentContainerStyle={{ padding: 16, paddingBottom: 48, gap: 16 }}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
+        bottomOffset={16}
       >
         {/* ── Platform selector — luôn hiển thị, disabled khi đang analyze/generate ── */}
         <Card variant="outlined" className="mb-0">
@@ -637,7 +645,7 @@ export default function ImageGeneratorScreen() {
         {!isAnalyzing && !analyzeResult && !generateResult && (
           <Card variant="outlined">
             <View className="items-center py-6" style={{ gap: 12 }}>
-              <Text style={{ fontSize: 32 }}>🎨</Text>
+              <MaterialIcons name="image" size={40} color="#9CA3AF" />
               <Text className="text-sm font-semibold text-gray-700 text-center">
                 Phân tích nội dung thất bại
               </Text>
@@ -679,7 +687,7 @@ export default function ImageGeneratorScreen() {
               />
               {analyzeResult.bannerSpecs.recommendedStyle ? (
                 <Text className="text-xs text-gray-500 mt-2 leading-4">
-                  💡 {analyzeResult.bannerSpecs.recommendedStyle}
+                  {analyzeResult.bannerSpecs.recommendedStyle}
                 </Text>
               ) : null}
               {/* Quota note */}
@@ -718,7 +726,7 @@ export default function ImageGeneratorScreen() {
                   onPress={handleGenerate}
                   disabled={isGenerating}
                 >
-                  🖼 Tạo ảnh banner (1 quota)
+                  Tạo ảnh banner (1 quota)
                 </Button>
 
                 {/* Copy draft prompt shortcut */}
@@ -750,7 +758,7 @@ export default function ImageGeneratorScreen() {
             </Button>
           </View>
         )}
-      </ScrollView>
+      </KeyboardAwareScrollView>
 
       {/* Quota Exceeded Bottom Sheet */}
       <BottomSheet
