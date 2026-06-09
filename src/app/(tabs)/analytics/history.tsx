@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import {
+import React, { useState } from 'react';import {
   View,
   Text,
   FlatList,
@@ -115,7 +114,25 @@ function HistoryCard({
 export default function AnalyticsHistoryScreen() {
   const router = useRouter();
   const [page, setPage] = useState(1);
+  const [allItems, setAllItems] = useState<AnalyticsHistoryItem[]>([]);
   const { data, isLoading, isError } = useAnalyticsHistory(page);
+
+  // Append items mới vào list khi page thay đổi
+  React.useEffect(() => {
+    if (data?.data?.length) {
+      if (page === 1) {
+        // Reset khi refresh về page 1
+        setAllItems(data.data);
+      } else {
+        // Append page mới, tránh duplicate
+        setAllItems((prev) => {
+          const existingIds = new Set(prev.map((i) => i.id));
+          const newItems = data.data.filter((i) => !existingIds.has(i.id));
+          return [...prev, ...newItems];
+        });
+      }
+    }
+  }, [data, page]);
 
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
@@ -159,7 +176,7 @@ export default function AnalyticsHistoryScreen() {
         </View>
       ) : (
         <FlatList
-          data={data?.data ?? []}
+          data={allItems}
           keyExtractor={(item) => String(item.id)}
           contentContainerStyle={{
             paddingHorizontal: 16,
@@ -175,16 +192,22 @@ export default function AnalyticsHistoryScreen() {
             />
           )}
           ListEmptyComponent={
-            <EmptyState
-              iconName="bar-chart"
-              title="Chưa có phân tích nào"
-              description="Phân tích số liệu mạng xã hội để xem kết quả tại đây"
-              actionLabel="Phân tích ngay"
-              onAction={() => router.push('/(tabs)/analytics/form' as any)}
-            />
+            !isLoading ? (
+              <EmptyState
+                iconName="bar-chart"
+                title="Chưa có phân tích nào"
+                description="Phân tích số liệu mạng xã hội để xem kết quả tại đây"
+                actionLabel="Phân tích ngay"
+                onAction={() => router.push('/(tabs)/analytics/form' as any)}
+              />
+            ) : null
           }
           ListFooterComponent={
-            data?.data?.length === 10 ? (
+            isLoading && page > 1 ? (
+              <View className="py-4 items-center">
+                <ActivityIndicator color="#111827" size="small" />
+              </View>
+            ) : data?.data?.length === 10 ? (
               <TouchableOpacity
                 className="py-3 items-center border border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800"
                 onPress={() => setPage((p) => p + 1)}
