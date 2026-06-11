@@ -8,7 +8,7 @@ import {
   ActivityIndicator,
   TextInput,
 } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTrends, useTrendTags } from '@/features/trends/hooks';
 import { TrendCard } from '@/components/ui/TrendCard';
@@ -19,8 +19,34 @@ import type { TrendItem } from '@/types/api';
 
 type FilterMode = number | undefined;
 
+// ─── Tách ra ngoài để tránh re-create mỗi render ─────────────────────────────
+interface TrendListItemProps {
+  item: TrendItem;
+  onGeneratePress: (trendId: number) => void;
+  onSelectPress?: (trend: TrendItem) => void;
+}
+
+const TrendListItem = React.memo(function TrendListItem({
+  item,
+  onGeneratePress,
+  onSelectPress,
+}: TrendListItemProps) {
+  return (
+    <TrendCard
+      trend={item}
+      onGeneratePress={onGeneratePress}
+      onSelectPress={onSelectPress}
+    />
+  );
+});
+
 export default function TrendsScreen() {
   const router = useRouter();
+  const params = useLocalSearchParams<{ fromGenerate?: string }>();
+
+  // Nếu user navigate từ màn hình Tạo nội dung → hiện mode chọn xu hướng
+  const isSelectMode = params.fromGenerate === '1';
+
   const [filterMode, setFilterMode] = useState<FilterMode>(undefined);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -64,6 +90,20 @@ export default function TrendsScreen() {
     [router]
   );
 
+  // Khi user đang ở "select mode" (từ màn hình Tạo nội dung), chọn xu hướng rồi navigate về
+  const handleSelectPress = useCallback(
+    (trend: TrendItem) => {
+      router.push({
+        pathname: '/(tabs)/generate',
+        params: {
+          trendId: String(trend.id),
+          trendTitle: trend.title,
+        },
+      });
+    },
+    [router]
+  );
+
   const handleLoadMore = useCallback(() => {
     if (searchQuery.trim()) return;
     if (hasNextPage && !isFetchingNextPage) fetchNextPage();
@@ -71,9 +111,13 @@ export default function TrendsScreen() {
 
   const renderItem = useCallback(
     ({ item }: { item: TrendItem }) => (
-      <TrendCard trend={item} onGeneratePress={handleGeneratePress} />
+      <TrendListItem
+        item={item}
+        onGeneratePress={handleGeneratePress}
+        onSelectPress={isSelectMode ? handleSelectPress : undefined}
+      />
     ),
-    [handleGeneratePress]
+    [handleGeneratePress, handleSelectPress, isSelectMode]
   );
 
   const keyExtractor = useCallback((item: TrendItem) => String(item.id), []);
@@ -81,6 +125,24 @@ export default function TrendsScreen() {
   return (
     <View className="flex-1 bg-white dark:bg-gray-900">
       <AppHeader title="Xu hướng" subtitle="Các chủ đề đang hot hôm nay" />
+
+      {/* Banner thông báo khi đang chọn xu hướng để tạo nội dung */}
+      {isSelectMode && (
+        <View className="mx-4 mt-3 mb-1 bg-gray-100 border border-gray-200 rounded-xl px-4 py-3 flex-row items-center justify-between">
+          <View className="flex-row items-center flex-1" style={{ gap: 8 }}>
+            <MaterialIcons name="info-outline" size={16} color="#374151" />
+            <Text className="text-sm font-medium text-gray-700 flex-1" numberOfLines={2}>
+              Chọn một xu hướng để tạo nội dung
+            </Text>
+          </View>
+          <TouchableOpacity
+            onPress={() => router.back()}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
+            <MaterialIcons name="close" size={18} color="#6B7280" />
+          </TouchableOpacity>
+        </View>
+      )}
 
       {/* Search box */}
       <View className="px-4 pt-3 pb-1">
@@ -170,6 +232,10 @@ export default function TrendsScreen() {
           refreshing={isRefetching}
           onEndReached={handleLoadMore}
           onEndReachedThreshold={0.3}
+          removeClippedSubviews
+          maxToRenderPerBatch={8}
+          initialNumToRender={6}
+          windowSize={10}
           ListFooterComponent={
             isFetchingNextPage ? (
               <ActivityIndicator color="#111827" style={{ marginVertical: 16 }} />

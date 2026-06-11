@@ -4,17 +4,15 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  Modal,
-  FlatList,
   ActivityIndicator,
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
-import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useRouter, useLocalSearchParams, useFocusEffect } from 'expo-router';
+import { MaterialIcons } from '@expo/vector-icons';
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 import { useGenerateContent } from '@/features/content/hooks';
 import { useContentStore } from '@/features/content/store';
-import { useTrends } from '@/features/trends/hooks';
-import type { ContentMode, TrendItem } from '@/types/api';
+import type { ContentMode } from '@/types/api';
 import type { AxiosError } from 'axios';
 import type { ApiError } from '@/types/api';
 
@@ -23,15 +21,15 @@ const OUTPUT_COUNTS = [1, 2, 3] as const;
 
 export default function GenerateScreen() {
   const router = useRouter();
-  const params = useLocalSearchParams<{ trendId?: string }>();
+  const params = useLocalSearchParams<{ trendId?: string; trendTitle?: string; mode?: string }>();
 
   // Mode selector
-  const [mode, setMode] = useState<ContentMode>('TrendBased');
+  const [mode, setMode] = useState<ContentMode>(
+    params.mode === 'PersonaDriven' ? 'PersonaDriven' : 'TrendBased'
+  );
 
-  // TrendBased state
-  const [selectedTrend, setSelectedTrend] = useState<TrendItem | null>(null);
-  const [showTrendPicker, setShowTrendPicker] = useState(false);
-  const [trendSearch, setTrendSearch] = useState('');
+  // TrendBased state — chỉ lưu id + title, không cần load toàn bộ trends ở đây nữa
+  const [selectedTrend, setSelectedTrend] = useState<{ id: number; title: string } | null>(null);
 
   // Shared state
   const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>(['Facebook']);
@@ -44,32 +42,56 @@ export default function GenerateScreen() {
   const { mutate: generate, isPending } = useGenerateContent();
   const { generatedItems } = useContentStore();
 
-  // Trends data cho picker
-  const { data: trendsData } = useTrends();
-  const allTrends: TrendItem[] = trendsData?.pages.flatMap((p) => p.items) ?? [];
-  const filteredTrends = allTrends.filter((t) =>
-    t.title.toLowerCase().includes(trendSearch.toLowerCase())
+  // Nhận trendId + trendTitle khi user chọn từ trang Xu hướng rồi navigate về
+  React.useEffect(() => {
+    if (params.trendId && params.trendTitle) {
+      setSelectedTrend({
+        id: Number(params.trendId),
+        title: params.trendTitle,
+      });
+      // Tự động chuyển sang mode TrendBased khi có trend được chọn
+      setMode('TrendBased');
+    }
+  }, [params.trendId, params.trendTitle]);
+
+  // Reset xu hướng đã chọn mỗi khi tab được focus lại,
+  // nhưng bỏ qua nếu user vừa navigate về từ trang Xu hướng (có params)
+  useFocusEffect(
+    useCallback(() => {
+      if (!params.trendId) {
+        setSelectedTrend(null);
+      }
+      // Reset mode theo param mỗi lần focus
+      if (params.mode === 'PersonaDriven') {
+        setMode('PersonaDriven');
+      } else if (!params.trendId) {
+        // Chỉ reset về TrendBased nếu không phải đang quay về sau khi chọn trend
+        setMode('TrendBased');
+      }
+    }, [params.trendId, params.mode])
   );
 
-  // Pre-fill trendId nếu navigate từ Trend Feed
-  React.useEffect(() => {
-    if (params.trendId) {
-      const found = allTrends.find((t) => String(t.id) === params.trendId);
-      if (found) setSelectedTrend(found);
-    }
-  }, [params.trendId, allTrends]);
-
   const togglePlatform = (platform: string) => {
-    setSelectedPlatforms((prev) =>
-      prev.includes(platform)
+    setSelectedPlatforms((prev) => {
+      const next = prev.includes(platform)
         ? prev.filter((p) => p !== platform)
-        : [...prev, platform]
-    );
+        : [...prev, platform];
+
+      // Auto-sync outputCount: đảm bảo ít nhất 1 bài per platform, capped ở 3
+      const synced = Math.min(Math.max(next.length, 1), 3) as 1 | 2 | 3;
+      setOutputCount(synced);
+
+      return next;
+    });
   };
+
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleGenerate = useCallback(() => {
     if (selectedPlatforms.length === 0) return;
     if (mode === 'TrendBased' && !selectedTrend) return;
+
+    setErrorMessage('');
 
     generate(
       {
@@ -82,13 +104,20 @@ export default function GenerateScreen() {
         userInstruction: userInstruction.trim() || undefined,
       },
       {
-        onSuccess: () => {
+        onSuccess: (response) => {
+          // Guard: không navigate nếu AI trả về items rỗng
+          if (!response?.items || response.items.length === 0) {
+            setErrorMessage('AI chưa tạo được nội dung. Vui lòng thử lại sau vài giây.');
+            return;
+          }
           router.push('/(tabs)/generate/result');
         },
         onError: (err) => {
           const axiosError = err as AxiosError<ApiError>;
           if (axiosError.response?.status === 429) {
             quotaSheetRef.current?.expand();
+          } else {
+            setErrorMessage('Có lỗi xảy ra. Vui lòng thử lại.');
           }
         },
       }
@@ -135,26 +164,57 @@ export default function GenerateScreen() {
           </View>
         </View>
 
-        {/* TrendBased: Trend Picker */}
+        {/* TrendBased: Banner dẫn sang trang Xu hướng */}
         {mode === 'TrendBased' && (
           <View className="px-5 mb-4">
-            <Text className="text-sm font-semibold text-gray-700 mb-2">Chọn xu hướng</Text>
-            <TouchableOpacity
-              className={`border rounded-xl px-4 py-3.5 flex-row items-center justify-between ${
-                selectedTrend ? 'border-primary-300 bg-primary-50' : 'border-gray-200 bg-gray-50'
-              }`}
-              onPress={() => setShowTrendPicker(true)}
-            >
-              <Text
-                className={`flex-1 text-sm ${
-                  selectedTrend ? 'text-gray-900 font-medium' : 'text-gray-400'
-                }`}
-                numberOfLines={1}
+            <Text className="text-sm font-semibold text-gray-700 mb-2">Xu hướng</Text>
+
+            {selectedTrend ? (
+              /* Đã chọn xu hướng — hiện chip + nút Đổi */
+              <View className="border border-primary-300 bg-primary-50 rounded-xl px-4 py-3 flex-row items-center justify-between">
+                <View className="flex-1 mr-3">
+                  <Text className="text-xs text-primary-500 font-semibold mb-0.5">Đã chọn</Text>
+                  <Text className="text-sm font-medium text-gray-900" numberOfLines={2}>
+                    {selectedTrend.title}
+                  </Text>
+                </View>
+                <TouchableOpacity
+                  className="border border-gray-300 bg-white rounded-lg px-3 py-1.5"
+                  onPress={() =>
+                    router.push({
+                      pathname: '/(tabs)/trends',
+                      params: { fromGenerate: '1' },
+                    })
+                  }
+                  activeOpacity={0.7}
+                >
+                  <Text className="text-xs font-semibold text-gray-700">Đổi</Text>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              /* Chưa chọn — banner mồi dẫn sang trang Xu hướng */
+              <TouchableOpacity
+                className="border border-dashed border-gray-300 bg-gray-50 rounded-xl px-4 py-4 flex-row items-center justify-between"
+                onPress={() =>
+                  router.push({
+                    pathname: '/(tabs)/trends',
+                    params: { fromGenerate: '1' },
+                  })
+                }
+                activeOpacity={0.7}
               >
-                {selectedTrend ? selectedTrend.title : 'Chọn một xu hướng...'}
-              </Text>
-              <Text className="text-gray-400 ml-2">▼</Text>
-            </TouchableOpacity>
+                <View className="flex-row items-center flex-1" style={{ gap: 10 }}>
+                  <View className="w-9 h-9 rounded-xl bg-gray-200 items-center justify-center">
+                    <MaterialIcons name="trending-up" size={20} color="#374151" />
+                  </View>
+                  <View className="flex-1">
+                    <Text className="text-sm font-semibold text-gray-800">Chọn xu hướng</Text>
+                    <Text className="text-xs text-gray-400 mt-0.5">Xem các chủ đề đang hot để tạo nội dung</Text>
+                  </View>
+                </View>
+                <MaterialIcons name="chevron-right" size={20} color="#9CA3AF" />
+              </TouchableOpacity>
+            )}
           </View>
         )}
 
@@ -189,27 +249,43 @@ export default function GenerateScreen() {
 
         {/* Output Count */}
         <View className="px-5 mb-4">
-          <Text className="text-sm font-semibold text-gray-700 mb-2">Số bài đầu ra</Text>
+          <View className="flex-row items-center justify-between mb-2">
+            <Text className="text-sm font-semibold text-gray-700">Số bài đầu ra</Text>
+            {selectedPlatforms.length > 1 && (
+              <Text className="text-xs text-primary-500">
+                1 bài / nền tảng
+              </Text>
+            )}
+          </View>
           <View className="flex-row" style={{ gap: 8 }}>
-            {OUTPUT_COUNTS.map((count) => (
-              <TouchableOpacity
-                key={count}
-                className={`w-12 h-12 rounded-xl border items-center justify-center ${
-                  outputCount === count
-                    ? 'bg-primary-500 border-primary-500'
-                    : 'bg-white border-gray-200'
-                }`}
-                onPress={() => setOutputCount(count)}
-              >
-                <Text
-                  className={`text-base font-bold ${
-                    outputCount === count ? 'text-white' : 'text-gray-700'
+            {OUTPUT_COUNTS.map((count) => {
+              const isActive = outputCount === count;
+              const isDisabled = selectedPlatforms.length > 1 && count !== outputCount;
+              return (
+                <TouchableOpacity
+                  key={count}
+                  className={`w-12 h-12 rounded-xl border items-center justify-center ${
+                    isActive
+                      ? 'bg-primary-500 border-primary-500'
+                      : isDisabled
+                      ? 'bg-gray-50 border-gray-100'
+                      : 'bg-white border-gray-200'
                   }`}
+                  onPress={() => {
+                    if (selectedPlatforms.length <= 1) setOutputCount(count);
+                  }}
+                  activeOpacity={isDisabled ? 1 : 0.7}
                 >
-                  {count}
-                </Text>
-              </TouchableOpacity>
-            ))}
+                  <Text
+                    className={`text-base font-bold ${
+                      isActive ? 'text-white' : isDisabled ? 'text-gray-300' : 'text-gray-700'
+                    }`}
+                  >
+                    {count}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
           </View>
         </View>
 
@@ -264,72 +340,14 @@ export default function GenerateScreen() {
               Vui lòng chọn một xu hướng trước
             </Text>
           )}
+          {errorMessage.length > 0 && (
+            <View className="mt-3 bg-red-50 border border-red-200 rounded-xl px-4 py-3 flex-row items-center" style={{ gap: 8 }}>
+              <MaterialIcons name="error-outline" size={16} color="#DC2626" />
+              <Text className="text-sm text-red-600 flex-1">{errorMessage}</Text>
+            </View>
+          )}
         </View>
       </KeyboardAwareScrollView>
-
-      {/* Trend Picker Modal */}
-      <Modal
-        visible={showTrendPicker}
-        animationType="slide"
-        presentationStyle="pageSheet"
-        onRequestClose={() => setShowTrendPicker(false)}
-      >
-        <View className="flex-1 bg-white">
-          <View className="px-5 pt-6 pb-3 border-b border-gray-100">
-            <View className="flex-row items-center justify-between mb-3">
-              <Text className="text-lg font-bold text-gray-900">Chọn xu hướng</Text>
-              <TouchableOpacity onPress={() => setShowTrendPicker(false)}>
-                <Text className="text-primary-500 font-medium">Đóng</Text>
-              </TouchableOpacity>
-            </View>
-            <TextInput
-              className="border border-gray-200 rounded-xl px-4 py-3 bg-gray-50 text-gray-900"
-              placeholder="Tìm kiếm xu hướng..."
-              placeholderTextColor="#9CA3AF"
-              value={trendSearch}
-              onChangeText={setTrendSearch}
-            />
-          </View>
-          <FlatList
-            data={filteredTrends}
-            keyExtractor={(item) => String(item.id)}
-            contentContainerStyle={{ padding: 16 }}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                className={`p-3 rounded-xl mb-2 border ${
-                  selectedTrend?.id === item.id
-                    ? 'border-primary-300 bg-primary-50'
-                    : 'border-gray-100 bg-white'
-                }`}
-                onPress={() => {
-                  setSelectedTrend(item);
-                  setShowTrendPicker(false);
-                  setTrendSearch('');
-                }}
-              >
-                <Text className="text-sm font-medium text-gray-900" numberOfLines={2}>
-                  {item.title}
-                </Text>
-                <View className="flex-row items-center mt-1" style={{ gap: 6 }}>
-                  <Text className="text-xs text-orange-500 font-medium">
-                    {item.hotLevel >= 8 ? `HOT ${item.hotLevel}` : item.hotLevel}
-                  </Text>
-                  {item.tags.slice(0, 2).map((tag) => (
-                    <Text key={tag.id} className="text-xs text-gray-400">
-                      #{tag.name}
-                    </Text>
-                  ))}
-                </View>
-              </TouchableOpacity>
-            )}
-            ListEmptyComponent={
-              <View className="items-center py-12">
-                <Text className="text-gray-400">Không tìm thấy xu hướng nào</Text>
-              </View>
-            }
-          />
-        </View>
-      </Modal>
 
       {/* Quota Exceeded Bottom Sheet */}
       <BottomSheet

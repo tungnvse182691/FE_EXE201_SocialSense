@@ -164,7 +164,7 @@ export default function GenerateResultScreen() {
 
   const handleBack = () => {
     clearResult();
-    router.back();
+    router.replace('/(tabs)/generate');
   };
 
   if (!generatedItems || generatedItems.length === 0) {

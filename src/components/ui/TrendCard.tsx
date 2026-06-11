@@ -5,6 +5,9 @@ import type { TrendItem } from '@/types/api';
 interface TrendCardProps {
   trend: TrendItem;
   onGeneratePress: (trendId: number) => void;
+  /** Khi được truyền vào (select mode từ màn hình Tạo nội dung),
+   *  nút action sẽ đổi thành "Dùng xu hướng này" thay vì "Tạo →" */
+  onSelectPress?: (trend: TrendItem) => void;
 }
 
 function getHotLevelConfig(level: number) {
@@ -29,7 +32,7 @@ const styles = StyleSheet.create({
   tagsRow: { gap: 4 },
 });
 
-export const TrendCard = React.memo(function TrendCard({ trend, onGeneratePress }: TrendCardProps) {
+export const TrendCard = React.memo(function TrendCard({ trend, onGeneratePress, onSelectPress }: TrendCardProps) {
   const hotConfig = getHotLevelConfig(trend.hotLevel);
 
   return (
@@ -66,11 +69,13 @@ export const TrendCard = React.memo(function TrendCard({ trend, onGeneratePress 
           ))}
         </View>
         <TouchableOpacity
-          className="bg-gray-900 px-3 py-2 rounded-xl"
-          onPress={() => onGeneratePress(trend.id)}
+          className={`px-3 py-2 rounded-xl ${onSelectPress ? 'bg-primary-500' : 'bg-gray-900'}`}
+          onPress={() => onSelectPress ? onSelectPress(trend) : onGeneratePress(trend.id)}
           activeOpacity={0.8}
         >
-          <Text className="text-white text-xs font-semibold">Tạo →</Text>
+          <Text className="text-white text-xs font-semibold">
+            {onSelectPress ? 'Dùng xu hướng này' : 'Tạo →'}
+          </Text>
         </TouchableOpacity>
       </View>
     </View>

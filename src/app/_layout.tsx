@@ -1,7 +1,13 @@
 import '../global.css';
 import React, { useEffect } from 'react';
-import { View, ActivityIndicator } from 'react-native';
+import { View, ActivityIndicator, LogBox } from 'react-native';
 import { Stack, useRouter, useSegments } from 'expo-router';
+
+// Suppress known React Native dev-mode warnings that don't affect production
+LogBox.ignoreLogs([
+  'VirtualizedList: You have a large list',
+  'Non-serializable values were found in the navigation state',
+]);
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { QueryClientProvider } from '@tanstack/react-query';

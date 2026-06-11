@@ -140,7 +140,7 @@ export default function DashboardScreen() {
           <TouchableOpacity
             className="bg-gray-50 border border-gray-200 rounded-2xl p-4 flex-row items-center"
             style={{ gap: 12 }}
-            onPress={() => router.push('/(tabs)/generate')}
+            onPress={() => router.push({ pathname: '/(tabs)/generate', params: { mode: 'PersonaDriven' } })}
             activeOpacity={0.85}
           >
             <View className="w-10 h-10 bg-gray-200 rounded-xl items-center justify-center">
