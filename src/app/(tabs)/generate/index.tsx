@@ -1,4 +1,4 @@
-﻿import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import {
   View,
   Text,
@@ -153,9 +153,8 @@ export default function GenerateScreen() {
                 onPress={() => setMode(m)}
               >
                 <Text
-                  className={`text-sm font-medium ${
-                    mode === m ? 'text-primary-600' : 'text-gray-500'
-                  }`}
+                  className={`text-sm font-medium ${mode === m ? 'text-primary-600' : 'text-gray-500'
+                    }`}
                 >
                   {m === 'TrendBased' ? 'Xu hướng' : 'Persona'}
                 </Text>
@@ -227,17 +226,15 @@ export default function GenerateScreen() {
               return (
                 <TouchableOpacity
                   key={platform}
-                  className={`px-3 py-2 rounded-xl border ${
-                    selected
+                  className={`px-3 py-2 rounded-xl border ${selected
                       ? 'bg-primary-500 border-primary-500'
                       : 'bg-white border-gray-200'
-                  }`}
+                    }`}
                   onPress={() => togglePlatform(platform)}
                 >
                   <Text
-                    className={`text-sm font-medium ${
-                      selected ? 'text-white' : 'text-gray-600'
-                    }`}
+                    className={`text-sm font-medium ${selected ? 'text-white' : 'text-gray-600'
+                      }`}
                   >
                     {platform}
                   </Text>
@@ -251,35 +248,29 @@ export default function GenerateScreen() {
         <View className="px-5 mb-4">
           <View className="flex-row items-center justify-between mb-2">
             <Text className="text-sm font-semibold text-gray-700">Số bài đầu ra</Text>
-            {selectedPlatforms.length > 1 && (
-              <Text className="text-xs text-primary-500">
-                1 bài / nền tảng
-              </Text>
-            )}
+            <Text className="text-xs text-primary-500">1 bài / nền tảng</Text>
           </View>
           <View className="flex-row" style={{ gap: 8 }}>
             {OUTPUT_COUNTS.map((count) => {
               const isActive = outputCount === count;
-              const isDisabled = selectedPlatforms.length > 1 && count !== outputCount;
+              const isDisabled = count !== selectedPlatforms.length;
               return (
                 <TouchableOpacity
                   key={count}
-                  className={`w-12 h-12 rounded-xl border items-center justify-center ${
-                    isActive
+                  className={`w-12 h-12 rounded-xl border items-center justify-center ${isActive
                       ? 'bg-primary-500 border-primary-500'
                       : isDisabled
-                      ? 'bg-gray-50 border-gray-100'
-                      : 'bg-white border-gray-200'
-                  }`}
+                        ? 'bg-gray-50 border-gray-100'
+                        : 'bg-white border-gray-200'
+                    }`}
                   onPress={() => {
-                    if (selectedPlatforms.length <= 1) setOutputCount(count);
+                    if (!isDisabled) setOutputCount(count);
                   }}
                   activeOpacity={isDisabled ? 1 : 0.7}
                 >
                   <Text
-                    className={`text-base font-bold ${
-                      isActive ? 'text-white' : isDisabled ? 'text-gray-300' : 'text-gray-700'
-                    }`}
+                    className={`text-base font-bold ${isActive ? 'text-white' : isDisabled ? 'text-gray-300' : 'text-gray-700'
+                      }`}
                   >
                     {count}
                   </Text>
@@ -313,9 +304,8 @@ export default function GenerateScreen() {
         {/* Generate Button */}
         <View className="px-5">
           <TouchableOpacity
-            className={`rounded-2xl py-4 items-center ${
-              canGenerate && !isPending ? 'bg-primary-500' : 'bg-gray-200'
-            }`}
+            className={`rounded-2xl py-4 items-center ${canGenerate && !isPending ? 'bg-primary-500' : 'bg-gray-200'
+              }`}
             onPress={handleGenerate}
             disabled={!canGenerate || isPending}
             activeOpacity={0.85}
@@ -327,9 +317,8 @@ export default function GenerateScreen() {
               </View>
             ) : (
               <Text
-                className={`font-semibold text-base ${
-                  canGenerate ? 'text-white' : 'text-gray-400'
-                }`}
+                className={`font-semibold text-base ${canGenerate ? 'text-white' : 'text-gray-400'
+                  }`}
               >
                 Tạo nội dung
               </Text>

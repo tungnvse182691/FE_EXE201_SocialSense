@@ -61,7 +61,7 @@ export const TrendCard = React.memo(function TrendCard({ trend, onGeneratePress,
 
       {/* Tags + Action button */}
       <View className="flex-row items-center justify-between">
-        <View className="flex-row flex-wrap flex-1 mr-2" style={styles.tagsRow}>
+        <View className="flex-row flex-wrap mr-2" style={[styles.tagsRow, { flexShrink: 1 }]}>
           {trend.tags.slice(0, 3).map((tag) => (
             <View key={tag.id} className="bg-gray-100 px-2 py-0.5 rounded-full">
               <Text className="text-xs text-gray-600 font-medium">{tag.name}</Text>
@@ -70,10 +70,11 @@ export const TrendCard = React.memo(function TrendCard({ trend, onGeneratePress,
         </View>
         <TouchableOpacity
           className={`px-3 py-2 rounded-xl ${onSelectPress ? 'bg-primary-500' : 'bg-gray-900'}`}
+          style={{ flexShrink: 0 }}
           onPress={() => onSelectPress ? onSelectPress(trend) : onGeneratePress(trend.id)}
           activeOpacity={0.8}
         >
-          <Text className="text-white text-xs font-semibold">
+          <Text className="text-white text-xs font-semibold" numberOfLines={1}>
             {onSelectPress ? 'Dùng xu hướng này' : 'Tạo →'}
           </Text>
         </TouchableOpacity>

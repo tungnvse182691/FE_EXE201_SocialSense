@@ -165,45 +165,47 @@ export default function TrendsScreen() {
       </View>
 
       {/* Filter chips */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={{ height: 48, flexGrow: 0 }}
-        contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 6, gap: 8, alignItems: 'center' }}
-      >
-
-
-        {/* Chip: Tất cả */}
-        <TouchableOpacity
-          className={`px-3 py-1.5 rounded-full border ${
-            filterMode === undefined
-              ? 'bg-primary-500 border-primary-500'
-              : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-600'
-          }`}
-          onPress={() => setFilterMode(undefined)}
+      <View style={{ height: 56, justifyContent: 'center' }}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={{ flexGrow: 0 }}
+          contentContainerStyle={{ paddingHorizontal: 16, gap: 8, alignItems: 'center' }}
         >
-          <Text className={`text-xs font-medium ${filterMode === undefined ? 'text-white' : 'text-gray-600 dark:text-gray-300'}`}>
-            Tất cả
-          </Text>
-        </TouchableOpacity>
 
-        {/* Tag chips */}
-        {tags?.map((tag) => (
+
+          {/* Chip: Tất cả */}
           <TouchableOpacity
-            key={tag.id}
             className={`px-3 py-1.5 rounded-full border ${
-              selectedTagId === tag.id
+              filterMode === undefined
                 ? 'bg-primary-500 border-primary-500'
                 : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-600'
             }`}
-            onPress={() => setFilterMode(selectedTagId === tag.id ? undefined : tag.id)}
+            onPress={() => setFilterMode(undefined)}
           >
-            <Text className={`text-xs font-medium ${selectedTagId === tag.id ? 'text-white' : 'text-gray-600 dark:text-gray-300'}`}>
-              {tag.name}
+            <Text className={`text-xs font-medium ${filterMode === undefined ? 'text-white' : 'text-gray-600 dark:text-gray-300'}`}>
+              Tất cả
             </Text>
           </TouchableOpacity>
-        ))}
-      </ScrollView>
+
+          {/* Tag chips */}
+          {tags?.map((tag) => (
+            <TouchableOpacity
+              key={tag.id}
+              className={`px-3 py-1.5 rounded-full border ${
+                selectedTagId === tag.id
+                  ? 'bg-primary-500 border-primary-500'
+                  : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-600'
+              }`}
+              onPress={() => setFilterMode(selectedTagId === tag.id ? undefined : tag.id)}
+            >
+              <Text className={`text-xs font-medium ${selectedTagId === tag.id ? 'text-white' : 'text-gray-600 dark:text-gray-300'}`}>
+                {tag.name}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </View>
 
       {/* Trend List */}
       {isLoading ? (
